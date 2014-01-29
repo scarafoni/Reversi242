@@ -13,10 +13,10 @@ import java.util.Random;
 class Move {
 	int i, j;
 	public Move () {
-		System.out.println("Move: ");
+		//System.out.println("Move: ");
 	}
 	public Move (int i, int j) {
-		System.out.println("Move: Move");
+		//System.out.println("Move: Move");
 		this.i = i;
 		this.j = j;
 	}
@@ -30,7 +30,6 @@ public class ReversiBoard {
 	boolean PassCounter;
 
 	public ReversiBoard() {
-		System.out.println("RBoard: ");
 		clear();	
 	}
 
@@ -40,7 +39,7 @@ public class ReversiBoard {
 	}
 
 	public void set(Move move, TKind player) {
-		System.out.println("RBoard: set");
+		//System.out.println("RBoard: set");
 		switch (board[move.i][move.j]) {
 			case white:  counter[1]--; break;
 			case black:  counter[0]--; break;
@@ -53,12 +52,12 @@ public class ReversiBoard {
 	}
 
 	public int getCounter(TKind player) {
-		System.out.println("RBoard: getCounter");
+		//System.out.println("RBoard: getCounter");
 		return counter[player.ordinal()-1];
 	}
 
 	public void clear() {
-		System.out.println("RBoard: clear");
+		//System.out.println("RBoard: clear");
 		for (int i = 0 ; i < 8 ; i++)
 			for (int j = 0 ; j < 8 ; j++)
 				board[i][j]=TKind.nil;
@@ -72,27 +71,25 @@ public class ReversiBoard {
 	}
 
 	public void println() {
-		System.out.println("RBoard: println");
 		System.out.print("[");
 		for (int i = 0 ; i < 8 ; i++) {
 			for (int j = 0 ; j < 8 ; j++)
 				System.out.print(board[i][j]+",");
-			System.out.println((i == 7? "]":""));
 			}
 	}
 
 	public int move(Move move, TKind kind) {
-		System.out.println("RBoard: move");
+		//System.out.println("RBoard: move");
 		return checkBoard(move,kind);
 	}
 
 	public boolean gameEnd() {
-		System.out.println("RBoard: gameEnd");
+		//System.out.println("RBoard: gameEnd");
 		return counter[0]+counter[1]==64;
 	}
 
 	private int Check(Move move, int incx, int incy, TKind kind , boolean set)  {
-		System.out.println("RBoard: check");
+		//System.out.println("RBoard: check");
 		TKind opponent;
 		int x=move.i;
 		int y=move.j;
@@ -115,7 +112,7 @@ public class ReversiBoard {
 	}
 
 	private int checkBoard(Move move, TKind kind) {
-		System.out.println("RBoard: checkBoard");
+		//System.out.println("RBoard: checkBoard");
 		// check increasing x
 		int j=Check(move,1,0,kind,true);
 		// check decreasing x
@@ -134,7 +131,7 @@ public class ReversiBoard {
 	}
 
 	private boolean isValid(Move move, TKind kind) {
-		System.out.println("RBoard: isValid");
+		//System.out.println("RBoard: isValid");
 		// check increasing x 
 		if (Check(move,1,0,kind,false) != 0) return true;
 		// check decreasing x 
@@ -152,7 +149,7 @@ public class ReversiBoard {
 	}
 
    private int strategy(TKind me, TKind opponent) {
-		System.out.println("RBoard: strategy");
+		//System.out.println("RBoard: strategy");
 	  int tstrat=0;
       for (int i = 0 ; i < 8 ; i++)
       if (board[i][0]==opponent)
@@ -182,7 +179,7 @@ public class ReversiBoard {
 	};
 
 	private resultFindMax FindMax(int level, TKind me, TKind opponent)  {
-		System.out.println("RBoard: resultFindMax");
+		//System.out.println("RBoard: resultFindMax");
 		int min,score,tnb,tnw;
 		TKind [][] TempBoard = new TKind[8][8];
 		int [] TempCounter = new int[2];
@@ -224,7 +221,7 @@ public class ReversiBoard {
 
 
 	public boolean findMove(TKind player, int llevel, Move move) {
-		System.out.println("RBoard: findMove");
+		//System.out.println("RBoard: findMove");
 		TKind [][] TempBoard = new TKind[8][8];
 		int [] TempCounter = new int[2];
 		int nb,nw,min,n_min;
@@ -272,7 +269,7 @@ public class ReversiBoard {
 	}
 
 	public boolean userCanMove(TKind player)  {
-		System.out.println("RBoard: userCanMove");
+		//System.out.println("RBoard: userCanMove");
 	for (int i = 0 ; i < 8 ; i++)
 		for (int j = 0 ; j < 8 ; j++)
 		  if ((board[i][j] == TKind.nil) && isValid(new Move(i,j),player)) return true;
