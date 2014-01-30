@@ -30,6 +30,7 @@ public class ReversiBoard {
 	boolean PassCounter;
 
 	public ReversiBoard() {
+		//System.out.println("RBoard: ");
 		clear();	
 	}
 
@@ -71,10 +72,12 @@ public class ReversiBoard {
 	}
 
 	public void println() {
+		//System.out.println("RBoard: println");
 		System.out.print("[");
 		for (int i = 0 ; i < 8 ; i++) {
 			for (int j = 0 ; j < 8 ; j++)
 				System.out.print(board[i][j]+",");
+			System.out.println((i == 7? "]":""));
 			}
 	}
 
@@ -85,6 +88,7 @@ public class ReversiBoard {
 
 	public boolean gameEnd() {
 		//System.out.println("RBoard: gameEnd");
+		//return true;
 		return counter[0]+counter[1]==64;
 	}
 
