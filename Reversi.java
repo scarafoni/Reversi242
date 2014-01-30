@@ -38,7 +38,7 @@ class GPanel extends JPanel implements MouseListener {
 	public boolean blH = false;
 	public String BLACK;
 	public String WHITE;
-
+	private Sockets socket;
 	public boolean iswhite = true;
 
 	ReversiBoard board;
@@ -55,7 +55,7 @@ class GPanel extends JPanel implements MouseListener {
 		this.board = board;
 		this.score_black = score_black;
 		this.score_white = score_white;
-
+		this.socket = new Sockets();
 		TIMELIMIT = ti;
 		DISPLAY = disp;
 		
@@ -208,15 +208,17 @@ class GPanel extends JPanel implements MouseListener {
 
 			boolean validInput = false;
 			while(!validInput) {
-				String input = br.readLine();
+				String input = socket.getInput();//br.readLine();
+				System.out.println("input received");
+				socket.sendBoard("input received");
 				String[] inputSplit = input.split(" ");
 				System.out.println(inputSplit[0]+" "+inputSplit[1]);
 
 				try {
 					i = Integer.parseInt(inputSplit[0]);
-					System.out.println(i);
+					//System.out.println(i);
 					j = Integer.parseInt(inputSplit[1]);
-					System.out.println(j);
+					//System.out.println(j);
 
 if ((!iswhite && (i < 8) && (j < 8) && (board.get(i,j) == TKind.nil) && (board.move(new Move(i,j),TKind.black) != 0)) || (iswhite && (i < 8) && (j < 8) && (board.get(i,j) == TKind.nil) && (board.move(new Move(i,j),TKind.white) != 0))) {validInput = true;}
 					else {
@@ -387,7 +389,6 @@ public class Reversi extends JFrame implements ActionListener{
 
 	static final String WindowTitle = "Reversi";
 	static final String ABOUTMSG = WindowTitle+"\n\n26-12-2006\njavalc6";
-
 	static GPanel gpanel;
 	static JMenuItem hint;
 	static boolean helpActive = false;
@@ -412,7 +413,6 @@ public class Reversi extends JFrame implements ActionListener{
 		score_white.setFont(new Font("Dialog", Font.BOLD, 16));
 		board = new ReversiBoard();
 		gpanel = new GPanel(board, score_black, score_white,"Classic", 3, time, disp, bl, wh);
-
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setupMenuBar();
 		gpanel.setMinimumSize(new Dimension(Reversi.Width,Reversi.Height));
