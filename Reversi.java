@@ -79,10 +79,6 @@ class GPanel extends JPanel implements MouseListener {
 		setTheme(theme);
 		
 		addMouseListener(this);
-				
-		//inputEnabled = true;
-		//active = true;
-		
 	}
 
 	public void setTheme(String gameTheme)  {
@@ -193,37 +189,29 @@ class GPanel extends JPanel implements MouseListener {
 
 	public void computerMove() {
 		System.out.println("GPanel: computerMove");
-		//if (board.gameEnd()) {
-		//	showWinner();
-		//	return;
-		//}
-		//get input
 		Integer i = 0;
 		Integer j = 0;
 		try { 
-			
-			
-			
-			BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+				
+			//BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
-			boolean validInput = false;
-			while(!validInput) {
+			//boolean validInput = false;
+			//while(!validInput) {
 				String input = socket.getInput();//br.readLine();
 				System.out.println("input received");
-				socket.sendBoard("input received");
+				socket.sendBoard("board goes here");
+
+				//process numbers
 				String[] inputSplit = input.split(" ");
 				System.out.println(inputSplit[0]+" "+inputSplit[1]);
-
 				try {
 					i = Integer.parseInt(inputSplit[0]);
-					//System.out.println(i);
 					j = Integer.parseInt(inputSplit[1]);
-					//System.out.println(j);
 
-if ((!iswhite && (i < 8) && (j < 8) && (board.get(i,j) == TKind.nil) && (board.move(new Move(i,j),TKind.black) != 0)) || (iswhite && (i < 8) && (j < 8) && (board.get(i,j) == TKind.nil) && (board.move(new Move(i,j),TKind.white) != 0))) {validInput = true;}
+					if ((!iswhite && (i < 8) && (j < 8) && (board.get(i,j) == TKind.nil) && (board.move(new Move(i,j),TKind.black) != 0)) || 
+						(iswhite && (i < 8) && (j < 8) && (board.get(i,j) == TKind.nil) && (board.move(new Move(i,j),TKind.white) != 0))) 
+							validInput = true;
 					else {
-						//JOptionPane.showMessageDialog(this, "Illegal move","Reversi",JOptionPane.ERROR_MESSAGE);
-						//System.out.println("Illegal Move");
 						illegalMove();
 					}
 				}
