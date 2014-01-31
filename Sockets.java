@@ -12,11 +12,12 @@ public class Sockets {
 	public Sockets() {
 		try {
 			serverSocket = new ServerSocket(portNumber);
+			System.out.println("waiting for client to accept...");
 			clientSocket = serverSocket.accept();
 			out = new PrintWriter(clientSocket.getOutputStream(), true);
 			in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 		
-			out.println(outputLine);
+			out.println("test connection");
 			System.out.println("connection successful");
 
 		} catch (IOException e) {
@@ -26,6 +27,8 @@ public class Sockets {
 		}
 	}
 
-	public String getInput(String output) throws IOException 
+	public String getInput() throws IOException 
 		{return in.readLine();}
+	public void sendBoard(String board)
+		{out.println(board);}
 }
