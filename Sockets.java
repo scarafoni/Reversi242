@@ -9,8 +9,9 @@ public class Sockets {
 	BufferedReader in;
 	String inputLine, outputLine;
 
-	public Sockets() {
+	public Sockets(int portNum) {
 		try {
+			portNumber = portNum;
 			serverSocket = new ServerSocket(portNumber);
 			System.out.println("waiting for client to accept...");
 			clientSocket = serverSocket.accept();

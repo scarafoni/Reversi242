@@ -38,7 +38,8 @@ class GPanel extends JPanel implements MouseListener {
 	public boolean blH = false;
 	public String BLACK;
 	public String WHITE;
-	private Sockets socket;
+	private Sockets whiteSocket;
+	private Sockets blackSocket;
 	public boolean iswhite = true;
 
 	ReversiBoard board;
@@ -55,7 +56,12 @@ class GPanel extends JPanel implements MouseListener {
 		this.board = board;
 		this.score_black = score_black;
 		this.score_white = score_white;
-		this.socket = new Sockets();
+		System.out.println("white player, please connect on port 4444");
+		this.whiteSocket = new Sockets(4444);
+		System.out.println("white player connected");
+		System.out.println("black player, please connect on port 5555");
+		this.blackSocket = new Sockets(5555);
+		System.out.println("black player connected");
 		TIMELIMIT = ti;
 		DISPLAY = disp;
 		
@@ -106,7 +112,7 @@ class GPanel extends JPanel implements MouseListener {
 	}
 
 	public void drawPanel(Graphics g) {
-		System.out.println("GPanel: drawPanel");
+		//System.out.println("GPanel: drawPanel");
 //	    int currentWidth = getWidth();
 //		int currentHeight = getHeight();
 		for (int i = 1 ; i < 8 ; i++) {
@@ -194,9 +200,22 @@ class GPanel extends JPanel implements MouseListener {
 		try { 
 			boolean validInput = false;
 			//while(!validInput) {
-				String input = socket.getInput();//br.readLine();
+				Sockets currentPlayer;
+				Sockets otherPlayer;
+				if(iswhite) {
+					currentPlayer = whiteSocket;
+					otherPlayer = blackSocket;
+				}
+				else {
+					currentPlayer = blackSocket;
+					otherPlayer = whiteSocket;
+				}
+
+				String input = currentPlayer.getInput();//br.readLine();
 				System.out.println("input received");
-				socket.sendBoard(board.printBoard());
+				currentPlayer.sendBoard(board.printBoard());
+				otherPlayer.sendBoard(board.printBoard());
+				System.out.println("board sent");
 
 				//process numbers
 				String[] inputSplit = input.split(" ");

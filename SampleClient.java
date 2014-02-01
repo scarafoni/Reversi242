@@ -4,7 +4,7 @@ import java.net.*;
 public class SampleClient {
     public static void main(String[] args) throws IOException {
         String hostName = "localhost";
-        int portNumber = 4444;
+        int portNumber = Integer.parseInt(args[0]);
 
         try {
             Socket kkSocket = new Socket(hostName, portNumber);

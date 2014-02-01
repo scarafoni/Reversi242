@@ -71,6 +71,17 @@ public class ReversiBoard {
 		PassCounter = false;
 	}
 
+	public String printBoard() {
+		String toReturn = "";
+		toReturn += "[";
+		for (int i = 0 ; i < 8 ; i++) {
+			for (int j = 0 ; j < 8 ; j++)
+				toReturn += board[i][j]+",";
+			toReturn += (i == 7? "]":"");
+			}
+			return toReturn;
+	}
+
 	public void println() {
 		//System.out.println("RBoard: println");
 		System.out.print("[");
