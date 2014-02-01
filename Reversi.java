@@ -210,43 +210,37 @@ class GPanel extends JPanel implements MouseListener {
 
 					if ((!iswhite && (i < 8) && (j < 8) && (board.get(i,j) == TKind.nil) && (board.move(new Move(i,j),TKind.black) != 0)) || 
 						(iswhite && (i < 8) && (j < 8) && (board.get(i,j) == TKind.nil) && (board.move(new Move(i,j),TKind.white) != 0))) 
-							validInput = true;blah
-					else {
+							validInput = true;
+					else 
 						illegalMove();
-					}
-				}
-				catch(NumberFormatException e) {
+				}catch(NumberFormatException e) {
 					System.out.println("poorly formatted input");
 					illegalMove();
-					validInput = false;
+					//validInput = false;
 				}
-			}
 		}catch(IOException e) {e.printStackTrace();}
 		
-		//Move move = new Move(i,j);
-		//Move move = new Move();
-		if (true){//board.findMove(TKind.white,gameLevel,move)) {
-			//board.move(move,TKind.white);
-			score_black.setText(Integer.toString(board.getCounter(TKind.black)));
-			score_white.setText(Integer.toString(board.getCounter(TKind.white)));
-			repaint();
-			if (board.gameEnd()) showWinner();
-			else if (!board.userCanMove(TKind.black)) {
-				   //JOptionPane.showMessageDialog(this, "You pass...","Reversi",JOptionPane.INFORMATION_MESSAGE);
-					System.out.println("You Pass");
-
-					javax.swing.SwingUtilities.invokeLater(new Runnable() {
-						public void run() {
-							//computerMove();
-						}
-					});
-				}
+		//if (true){/board.findMove(TKind.white,gameLevel,move)) {
+		//board.move(move,TKind.white);
+		score_black.setText(Integer.toString(board.getCounter(TKind.black)));
+		score_white.setText(Integer.toString(board.getCounter(TKind.white)));
+		repaint();
+		if (board.gameEnd()) 
+			showWinner();
+		else if (!board.userCanMove(TKind.black)) {
+				System.out.println("You Pass");
+				/*
+				javax.swing.SwingUtilities.invokeLater(new Runnable() {
+					public void run() {
+						//computerMove();
+					}
+				});
+			}
+			*/
 		}
-		else if (board.userCanMove(TKind.black)) {
+		else if (board.userCanMove(TKind.black)) 
 			System.out.println("I Pass");
-		   	//JOptionPane.showMessageDialog(this, "I pass...","Reversi",JOptionPane.INFORMATION_MESSAGE);
-		}
-		   else showWinner();
+		else showWinner();
 	}
 
 
