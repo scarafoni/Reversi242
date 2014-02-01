@@ -51,7 +51,7 @@ class GPanel extends JPanel implements MouseListener {
 
 	public GPanel (ReversiBoard board, JLabel score_black, JLabel score_white, String theme, int level, int ti, String disp, String bl, String wh) {
 		super();
-		System.out.println("GPanel");
+		//System.out.println("GPanel");
 		this.board = board;
 		this.score_black = score_black;
 		this.score_white = score_white;
@@ -188,22 +188,19 @@ class GPanel extends JPanel implements MouseListener {
 
 
 	public void computerMove() {
-		System.out.println("GPanel: computerMove");
+		//System.out.println("GPanel: computerMove");
 		Integer i = 0;
 		Integer j = 0;
 		try { 
-				
-			//BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-
-			//boolean validInput = false;
+			boolean validInput = false;
 			//while(!validInput) {
 				String input = socket.getInput();//br.readLine();
 				System.out.println("input received");
-				socket.sendBoard("board goes here");
+				socket.sendBoard(board.printBoard());
 
 				//process numbers
 				String[] inputSplit = input.split(" ");
-				System.out.println(inputSplit[0]+" "+inputSplit[1]);
+				//System.out.println(inputSplit[0]+" "+inputSplit[1]);
 				try {
 					i = Integer.parseInt(inputSplit[0]);
 					j = Integer.parseInt(inputSplit[1]);
@@ -220,36 +217,21 @@ class GPanel extends JPanel implements MouseListener {
 				}
 		}catch(IOException e) {e.printStackTrace();}
 		
-		//if (true){/board.findMove(TKind.white,gameLevel,move)) {
-		//board.move(move,TKind.white);
 		score_black.setText(Integer.toString(board.getCounter(TKind.black)));
 		score_white.setText(Integer.toString(board.getCounter(TKind.white)));
 		repaint();
 		if (board.gameEnd()) 
 			showWinner();
-		else if (!board.userCanMove(TKind.black)) {
+		else if (!board.userCanMove(TKind.black))
 				System.out.println("You Pass");
-				/*
-				javax.swing.SwingUtilities.invokeLater(new Runnable() {
-					public void run() {
-						//computerMove();
-					}
-				});
-			}
-			*/
-		}
 		else if (board.userCanMove(TKind.black)) 
 			System.out.println("I Pass");
 		else showWinner();
 	}
 
-
-
-
-
 	public void mouseClicked(MouseEvent e) {
 		//System.out.println("GPanel: mouseClicked");
-// generato quando il mouse viene premuto e subito rilasciato (click)
+		// generato quando il mouse viene premuto e subito rilasciato (click)
 
 		if (inputEnabled) {
 			hint = null;
@@ -332,7 +314,7 @@ class GPanel extends JPanel implements MouseListener {
 
 	public void run() {
 		inputEnabled = false;
-		System.out.println("GPanel: run");
+		//System.out.println("GPanel: run");
 
 		while(!board.gameEnd()) {
 			iswhite = !iswhite;
@@ -386,7 +368,7 @@ public class Reversi extends JFrame implements ActionListener{
 	public Reversi(int time, String disp, String bl, String wh) {
 		super(WindowTitle);
 		
-		System.out.println("Reversi");
+		//System.out.println("Reversi");
 		score_black=new JLabel("2"); // the game start with 2 black pieces
 		score_black.setForeground(Color.blue);
 		score_black.setFont(new Font("Dialog", Font.BOLD, 16));
@@ -422,7 +404,7 @@ public class Reversi extends JFrame implements ActionListener{
 // File Edit Help
 //
 	void setupMenuBar() {
-		System.out.println("Reversi: setupMenuBar");
+		//System.out.println("Reversi: setupMenuBar");
 		JMenuBar menuBar = new JMenuBar();
 		menuBar.add(buildGameMenu());
 		menuBar.add(buildHelpMenu());
@@ -431,7 +413,7 @@ public class Reversi extends JFrame implements ActionListener{
 
 
     public void actionPerformed(ActionEvent e) {
-		System.out.println("Reversi: actionPerformed");
+		//System.out.println("Reversi: actionPerformed");
         JMenuItem source = (JMenuItem)(e.getSource());
 		String action = source.getText();
 		if (action.equals("2")) gpanel.setLevel(2);
@@ -445,7 +427,7 @@ public class Reversi extends JFrame implements ActionListener{
 	}
 
     protected JMenu buildGameMenu() {
-		System.out.println("Reversi: buildGameMenu");
+		//System.out.println("Reversi: buildGameMenu");
 		JMenu game = new JMenu("Game");
 		JMenuItem newWin = new JMenuItem("New");
 //		JMenuItem level = new JMenuItem("Level");
@@ -552,7 +534,7 @@ public class Reversi extends JFrame implements ActionListener{
 
 
 	protected JMenu buildHelpMenu() {
-		System.out.println("Reversi: buildHelpMenu");
+		//System.out.println("Reversi: buildHelpMenu");
 		JMenu help = new JMenu("Help");
 		JMenuItem about = new JMenuItem("About "+WindowTitle+"...");
 		JMenuItem openHelp = new JMenuItem("Help Topics...");
@@ -579,7 +561,7 @@ public class Reversi extends JFrame implements ActionListener{
     }
 
     protected void createEditorPane() {
-	System.out.println("Reversi: createEditorPane");
+	//System.out.println("Reversi: createEditorPane");
         if (helpActive) return;
 		editorPane = new JEditorPane(); 
         editorPane.setEditable(false);
