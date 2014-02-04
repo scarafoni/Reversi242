@@ -31,6 +31,7 @@ public class SampleClient {
         } catch (IOException e) {
             System.err.println("Couldn't get I/O for the connection to " +
                 hostName);
+	System.err.println(e.getMessage());
             System.exit(1);
         }
     }
