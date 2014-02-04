@@ -19,7 +19,7 @@ public class SampleClient {
 
             while ((fromServer = in.readLine()) != null) {
                 System.out.println("Server: " + fromServer);
-                if (fromServer.equals("Bye."))
+                if (fromServer.equals("GAME_OVER"))
                     break;
                 
                 fromUser = stdIn.readLine();
@@ -31,6 +31,7 @@ public class SampleClient {
         } catch (IOException e) {
             System.err.println("Couldn't get I/O for the connection to " +
                 hostName);
+	System.err.println(e.getMessage());
             System.exit(1);
         }
     }

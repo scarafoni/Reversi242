@@ -28,6 +28,14 @@ import javax.swing.event.*;
 import javax.swing.text.html.*;
 import java.io.*;
 
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import java.util.concurrent.ExecutionException;
+
 class GPanel extends JPanel implements MouseListener {
 
 
@@ -38,9 +46,10 @@ class GPanel extends JPanel implements MouseListener {
 	public boolean blH = false;
 	public String BLACK;
 	public String WHITE;
-	private Sockets whiteSocket;
-	private Sockets blackSocket;
+	public Sockets whiteSocket;
+	public Sockets blackSocket;
 	public boolean iswhite = true;
+	public String gameOverString = "GAME_OVER";
 
 	ReversiBoard board;
 	int gameLevel;
@@ -56,30 +65,37 @@ class GPanel extends JPanel implements MouseListener {
 		this.board = board;
 		this.score_black = score_black;
 		this.score_white = score_white;
-		System.out.println("white player, please connect on port 4444");
-		this.whiteSocket = new Sockets(4444);
-		System.out.println("white player connected");
-		System.out.println("black player, please connect on port 5555");
-		this.blackSocket = new Sockets(5555);
-		System.out.println("black player connected");
+		
+		
 		TIMELIMIT = ti;
 		DISPLAY = disp;
 		
-
-		if (bl.equals("-human")) {
-			blH = true;
-		}
-		else {
-			BLACK = bl;
+		if((bl.equals("-human") || wh.equals("-human")) && !disp.equals("gui")) {
+			System.out.println("Need gui for human players");
+			System.exit(0);
 		}
 
 		if (wh.equals("-human")) {
 			whH = true;
 		}
 		else {
-			WHITE = wh;
+			System.out.println("white player, please connect on port 4444");
+			this.whiteSocket = new Sockets(4444);
+			System.out.println("white player connected");	
+			//WHITE = wh;
 		}
-		
+
+
+		if (bl.equals("-human")) {
+			blH = true;
+		}
+		else {
+			System.out.println("black player, please connect on port 5555");
+			this.blackSocket = new Sockets(5555);
+			System.out.println("black player connected");
+			//BLACK = bl;
+		}
+	
 		
 		gameLevel = level;
 		setTheme(theme);
@@ -165,16 +181,17 @@ class GPanel extends JPanel implements MouseListener {
 		active = false;
 		if (board.counter[0] > board.counter[1]) {
 			//JOptionPane.showMessageDialog(this, "You win!","Reversi",JOptionPane.INFORMATION_MESSAGE);
-			System.out.println("winner W " +  (board.counter[0] - board.counter[1]) + "legal");
+			System.out.println("winner B " +  (board.counter[0] - board.counter[1]) + " legal");
 		}
 		else if (board.counter[0] < board.counter[1]) {
 		   	//JOptionPane.showMessageDialog(this, "I win!","Reversi",JOptionPane.INFORMATION_MESSAGE);
-			System.out.println("winner W " +  (board.counter[0] - board.counter[1]) + "legal");
+			System.out.println("winner W " +  (board.counter[1] - board.counter[0]) + " legal");
 		}
 		else {
 			System.out.println("Draw");
 			//JOptionPane.showMessageDialog(this, "Drawn!","Reversi",JOptionPane.INFORMATION_MESSAGE);
 		}
+		System.exit(0);	
 	}
 
 	public void setHint(Move hint) {
@@ -202,6 +219,15 @@ class GPanel extends JPanel implements MouseListener {
 			//while(!validInput) {
 				Sockets currentPlayer;
 				Sockets otherPlayer;
+
+				if(whiteSocket==null) {
+					System.out.println("whitesocket is null");
+					System.exit(0);
+				}
+				if(blackSocket==null) {
+					System.out.println("blacksocket is null");
+					System.exit(0);
+				}
 				if(iswhite) {
 					currentPlayer = whiteSocket;
 					otherPlayer = blackSocket;
@@ -239,19 +265,32 @@ class GPanel extends JPanel implements MouseListener {
 		score_black.setText(Integer.toString(board.getCounter(TKind.black)));
 		score_white.setText(Integer.toString(board.getCounter(TKind.white)));
 		repaint();
+
 		if (board.gameEnd()) 
+			showWinner();
+
+		if (iswhite && !board.userCanMove(TKind.black)) {
+			System.out.println("black cant move");
+			showWinner();
+		}
+		if (!iswhite && !board.userCanMove(TKind.white)) {
+			System.out.println("white cant move");
+			showWinner();
+		}
+		run();
+
+		/*if (board.gameEnd()) 
 			showWinner();
 		else if (!board.userCanMove(TKind.black))
 				System.out.println("You Pass");
 		else if (board.userCanMove(TKind.black)) 
 			System.out.println("I Pass");
-		else showWinner();
+		else showWinner();*/
 	}
 
 	public void mouseClicked(MouseEvent e) {
 		//System.out.println("GPanel: mouseClicked");
 		// generato quando il mouse viene premuto e subito rilasciato (click)
-
 		if (inputEnabled) {
 			hint = null;
 			int i = e.getX() / Reversi.Square_L;
@@ -269,12 +308,26 @@ class GPanel extends JPanel implements MouseListener {
 						
 						setCursor(savedCursor);			
 					}
-				});	
+				});
+				inputEnabled = false;
+
+				if (board.gameEnd()) {
+					showWinner();			
+				}
+				if (iswhite && !board.userCanMove(TKind.black)) {
+					System.out.println("black cant move");
+					showWinner();
+				}
+				if (!iswhite && !board.userCanMove(TKind.white)) {
+					System.out.println("white cant move");
+					showWinner();
+				}
+				run();
 			}
 			else JOptionPane.showMessageDialog(this, "Illegal move","Reversi",JOptionPane.ERROR_MESSAGE);
+			
 		}
 	}
-
 
 	public void mouseEntered(MouseEvent e) {
 // generato quando il mouse entra nella finestra
@@ -298,70 +351,99 @@ class GPanel extends JPanel implements MouseListener {
 
 	public boolean moved = false;
 	
+	public int getTime() {
+		return TIMELIMIT;
+	}
+
+
 	public void timeup() {
 		if(iswhite) {
-			System.out.println("winner B " + (board.counter[0] - board.counter[1]) + "timeout");		
+			System.out.println("winner B " + (board.counter[0] - board.counter[1]) + " timeout");	
 		}
 		else {
-			System.out.println("winner W " +  (board.counter[0] - board.counter[1]) + "timeout");
+			System.out.println("winner W " +  (board.counter[1] - board.counter[0]) + " timeout");	
 		}
+		whiteSocket.sendBoard(gameOverString);
+		blackSocket.sendBoard(gameOverString);
 		System.exit(0);
 	}
 	public void illegalMove() {
 		if(iswhite) {
-			System.out.println("winner B " +  (board.counter[0] - board.counter[1]) + "Illegal");		
+			System.out.println("winner B " +  (board.counter[0] - board.counter[1]) + " Illegal");
 		}
 		else {
-			System.out.println("winner W " + (board.counter[0] - board.counter[1]) + "Illegal");
+			System.out.println("winner W " + (board.counter[1] - board.counter[0]) + " Illegal");
 		}
+		whiteSocket.sendBoard(gameOverString);
+		blackSocket.sendBoard(gameOverString);
 		System.exit(0);
 	}
 
-
-
-	public void humanMove() {
-		//System.out.println("GPanel: humanMove");
-		inputEnabled = true;
-		active = true;
-		
-		while(!moved) {
-
-		}
-
-		inputEnabled = false;
-	}
 
 	public void run() {
 		inputEnabled = false;
 		//System.out.println("GPanel: run");
 
-		while(!board.gameEnd()) {
+		//while(!board.gameEnd()) {
 			iswhite = !iswhite;
+
+			if(DISPLAY.equals("text")) {
+				System.out.println(board.textBoard());
+			}
 
 			if(iswhite) {
 			    System.out.println("IT IS WHITE'S TURN");
 			    if(whH) {
-				    //humanMove();
+					inputEnabled = true;
+					
 			    }
 			    else {
-				
-				    computerMove();
+				final Runnable stuffToDo = new Thread() {
+					@Override public void run() {computerMove();}
+				};
+				final ExecutorService executor = Executors.newSingleThreadExecutor();
+				final Future future = executor.submit(stuffToDo);
+				executor.shutdown();
+				try { future.get(TIMELIMIT, TimeUnit.MILLISECONDS); }
+				catch (InterruptedException ie) {System.out.println(ie.getMessage());System.exit(0); }
+				catch (TimeoutException te) { timeup();}
+				catch (ExecutionException ee) { System.out.println(ee.getMessage());System.exit(0);}
+				if (!executor.isTerminated())
+				executor.shutdownNow();
+
+				    //computerMove();
 
 			    }
 			}
 			else {
 			  System.out.println("IT IS BLACK'S TURN");
 			      if(blH) {
-				      //humanMove();
+				inputEnabled = true;
 			      }
 			      else {
-				      computerMove();
+
+				final Runnable stuffToDo = new Thread() {
+					@Override public void run(){ computerMove();}
+				};
+				final ExecutorService executor = Executors.newSingleThreadExecutor();
+				final Future future = executor.submit(stuffToDo);
+				executor.shutdown();
+				try { future.get(TIMELIMIT, TimeUnit.MILLISECONDS); }
+				catch (InterruptedException ie) { System.out.println(ie.getMessage());System.exit(0);}
+				catch (TimeoutException te) { timeup();}
+				catch (ExecutionException ee) { System.out.println(ee.getMessage());System.exit(0);}
+				if (!executor.isTerminated())
+				executor.shutdownNow();
+				     // computerMove();
 			      }
 			}
-		}
-		showWinner();
+		//}
+		//showWinner();
 
 	}
+
+
+
 
 
 };
@@ -410,7 +492,13 @@ public class Reversi extends JFrame implements ActionListener{
 		getContentPane().add(splitPane);
 
 		pack();
-		setVisible(true);
+		if(disp.equals("none"))
+			setVisible(false);
+		else if(disp.equals("text"))
+			setVisible(false);
+		else
+			setVisible(true);
+
 		setResizable(false);
 
 

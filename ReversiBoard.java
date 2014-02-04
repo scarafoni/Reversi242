@@ -82,6 +82,33 @@ public class ReversiBoard {
 			return toReturn;
 	}
 
+	public String textBoard() {
+		String toReturn = "";
+		for(int x = 0; x<8; x++) {
+			for(int y = 0; y<8; y++) {
+				toReturn+= "--";
+			}
+			toReturn+= "-";
+			toReturn+="\n";
+			for(int y = 0; y<8; y++) {
+				toReturn+= "|";
+				if(board[x][y] == TKind.black)
+					toReturn+= "B";
+				else if(board[x][y] == TKind.white)
+					toReturn+= "W";
+				else
+					toReturn+= " ";
+			}
+			toReturn+="|";
+			toReturn+="\n";
+		}
+		for(int y = 0; y<8; y++) {
+			toReturn+= "--";
+		}
+		toReturn+= "-";
+		return toReturn;
+	}
+
 	public void println() {
 		//System.out.println("RBoard: println");
 		System.out.print("[");
