@@ -18,7 +18,7 @@ public class Sockets {
 			out = new PrintWriter(clientSocket.getOutputStream(), true);
 			in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 		
-			out.println("test connection");
+			//out.println("test connection");
 			System.out.println("connection successful");
 
 		} catch (IOException e) {
