@@ -51,8 +51,11 @@ class GPanel extends JPanel implements MouseListener {
 	public boolean iswhite = true;
 	public String gameOverString = "GAME_OVER";
 
-	public String blackIn;
-	public String blackOut;
+	BufferedWriter blackOut;
+	BufferedReader blackIn;
+	BufferedWriter whiteOut;
+	BufferedReader whiteIn;
+
 	public ReversiBoard board;
 	int gameLevel;
 	ImageIcon button_black, button_white;
@@ -61,16 +64,23 @@ class GPanel extends JPanel implements MouseListener {
 	Move hint=null;
 	boolean inputEnabled, active;
 
-	public GPanel (ReversiBoard board, JLabel score_black, JLabel score_white, String theme, int level, int ti, String disp, String bl, String wh,String in, String out) {
+	public GPanel (ReversiBoard board, JLabel score_black, JLabel score_white, String theme, int level, int ti, String disp, String bl, String wh,String bin, String bout,String win, String wout) {
 		super();
 		//System.out.println("GPanel");
 		this.board = board;
 		this.score_black = score_black;
 		this.score_white = score_white;
-		this.blackIn = in;
-		this.blackOut = out;
-		
-		
+		try{
+			System.out.println("init readers");
+			this.blackOut = new BufferedWriter(new FileWriter(bout));
+			System.out.println("1");
+			this.blackIn = new BufferedReader(new FileReader(bin));
+			System.out.println("2");
+			this.whiteOut = new BufferedWriter(new FileWriter(wout));
+			System.out.println("3");
+			this.whiteIn = new BufferedReader(new FileReader(win));
+		}catch(IOException e){e.printStackTrace();}
+		System.out.println("done initing readers");
 		TIMELIMIT = ti;
 		DISPLAY = disp;
 		
@@ -222,15 +232,7 @@ class GPanel extends JPanel implements MouseListener {
 		Integer j = 0;
 		try { 
 			boolean validInput = false;
-				/*
-				if(whiteSocket==null) {
-					System.out.println("whitesocket is null");
-					System.exit(0);
-				}
-				if(blackSocket==null) {
-					System.out.println("blacksocket is null");
-					System.exit(0);
-				}
+			/*
 				if(iswhite) {
 					currentPlayer = whiteSocket;
 					otherPlayer = blackSocket;
@@ -245,17 +247,30 @@ class GPanel extends JPanel implements MouseListener {
 				System.out.println("board sent");
 				*/
 				String input = "";
-				String currentPlayer = iswhite ? "white" :  "black";
+				BufferedReader currentIn;
+				BufferedWriter currentOut;
+				BufferedReader otherIn;
+				BufferedWriter otherOut;
+				String currentPlayer;
+				if(iswhite) {
+					currentPlayer = "white";
+					currentIn = whiteIn;
+					currentOut = whiteOut;
+					otherIn = blackIn;
+					otherOut = blackOut;
+				}
+				else {
+					currentPlayer = "black";
+					currentIn = blackIn;
+					currentOut = blackOut;
+					otherIn = whiteIn;
+					otherOut = whiteOut;
+				}
 				System.out.println(currentPlayer+ " please move "+board.printBoard());
 				try {
-					BufferedWriter bw = new BufferedWriter(new FileWriter(blackOut));
-					BufferedReader br = new BufferedReader(new FileReader(blackIn));
-					input=br.readLine();
+					input=currentIn.readLine();
 					System.out.println("read");
-					bw.write("stuff");
-
-					bw.close();
-					br.close();
+					currentOut.write("stuff");
 
 				}catch(Exception io) {
 					io.printStackTrace();
@@ -488,7 +503,7 @@ public class Reversi extends JFrame implements ActionListener{
 	static JLabel score_black, score_white;
 	JMenu level, theme;
 
-	public Reversi(int time, String disp, String bl, String wh,String in, String out) {
+	public Reversi(int time, String disp, String bl, String wh,String bin, String bout, String win, String wout) {
 		super(WindowTitle);
 		
 		//System.out.println("Reversi");
@@ -499,7 +514,7 @@ public class Reversi extends JFrame implements ActionListener{
 		score_white.setForeground(Color.red);
 		score_white.setFont(new Font("Dialog", Font.BOLD, 16));
 		board = new ReversiBoard();
-		gpanel = new GPanel(board, score_black, score_white,"Classic", 3, time, disp, bl, wh,in,out);
+		gpanel = new GPanel(board, score_black, score_white,"Classic", 3, time, disp, bl, wh,bin,bout,win,wout);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setupMenuBar();
 		gpanel.setMinimumSize(new Dimension(Reversi.Width,Reversi.Height));
@@ -782,7 +797,7 @@ public class Reversi extends JFrame implements ActionListener{
 			System.exit(0);
 		}
 		else {
-			Reversi app = new Reversi(Integer.parseInt(args[0]),args[1],args[2],args[3],args[4],args[5]);
+			Reversi app = new Reversi(Integer.parseInt(args[0]),args[1],args[2],args[3],args[4],args[5],args[6],args[7]);
 		}
 
 		
