@@ -46,11 +46,13 @@ class GPanel extends JPanel implements MouseListener {
 	public boolean blH = false;
 	public String BLACK;
 	public String WHITE;
-	public Sockets whiteSocket;
-	public Sockets blackSocket;
+	//public Sockets whiteSocket;
+	//public Sockets blackSocket;
 	public boolean iswhite = true;
 	public String gameOverString = "GAME_OVER";
 
+	public String blackIn;
+	public String blackOut;
 	public ReversiBoard board;
 	int gameLevel;
 	ImageIcon button_black, button_white;
@@ -59,12 +61,14 @@ class GPanel extends JPanel implements MouseListener {
 	Move hint=null;
 	boolean inputEnabled, active;
 
-	public GPanel (ReversiBoard board, JLabel score_black, JLabel score_white, String theme, int level, int ti, String disp, String bl, String wh) {
+	public GPanel (ReversiBoard board, JLabel score_black, JLabel score_white, String theme, int level, int ti, String disp, String bl, String wh,String in, String out) {
 		super();
 		//System.out.println("GPanel");
 		this.board = board;
 		this.score_black = score_black;
 		this.score_white = score_white;
+		this.blackIn = in;
+		this.blackOut = out;
 		
 		
 		TIMELIMIT = ti;
@@ -77,25 +81,26 @@ class GPanel extends JPanel implements MouseListener {
 
 		if (bl.equals("-human")) {
 			blH = true;
-		}
+		}/*
 		else {
+		
 			System.out.println("black player, please connect on port 4444");
 			this.blackSocket = new Sockets(4444);
 			System.out.println("black player connected");	
 			//WHITE = wh;
 		}
 
-
+		*/
 		if (wh.equals("-human")) {
 			whH = true;
 		}
-		else {
+		/*else {
 			System.out.println("white player, please connect on port 5555");
 			this.whiteSocket = new Sockets(5555);
 			System.out.println("white player connected");
 			//BLACK = bl;
 		}
-	
+		*/	
 		
 		gameLevel = level;
 		setTheme(theme);
@@ -217,10 +222,7 @@ class GPanel extends JPanel implements MouseListener {
 		Integer j = 0;
 		try { 
 			boolean validInput = false;
-			//while(!validInput) {
-				Sockets currentPlayer;
-				Sockets otherPlayer;
-
+				/*
 				if(whiteSocket==null) {
 					System.out.println("whitesocket is null");
 					System.exit(0);
@@ -240,9 +242,24 @@ class GPanel extends JPanel implements MouseListener {
 				currentPlayer.sendBoard(board.printBoard());
 				String input = currentPlayer.getInput();//br.readLine();
 				System.out.println("input received");
-				//currentPlayer.sendBoard(board.printBoard());
-				//otherPlayer.sendBoard(board.printBoard());
 				System.out.println("board sent");
+				*/
+				String input = "";
+				String currentPlayer = iswhite ? "white" :  "black";
+				System.out.println(currentPlayer+ " please move "+board.printBoard());
+				try {
+					BufferedWriter bw = new BufferedWriter(new FileWriter(blackOut));
+					BufferedReader br = new BufferedReader(new FileReader(blackIn));
+					input=br.readLine();
+					System.out.println("read");
+					bw.write("stuff");
+
+					bw.close();
+					br.close();
+
+				}catch(Exception io) {
+					io.printStackTrace();
+				}
 
 				//process numbers
 				String[] inputSplit = input.split(" ");
@@ -261,7 +278,7 @@ class GPanel extends JPanel implements MouseListener {
 					illegalMove();
 					//validInput = false;
 				}
-		}catch(IOException e) {e.printStackTrace();}
+		}catch(Exception e) {e.printStackTrace();}
 		
 		score_black.setText(Integer.toString(board.getCounter(TKind.black)));
 		score_white.setText(Integer.toString(board.getCounter(TKind.white)));
@@ -364,8 +381,9 @@ class GPanel extends JPanel implements MouseListener {
 		else {
 			System.out.println("winner W " +  (board.counter[1] - board.counter[0]) + " timeout");	
 		}
-		whiteSocket.sendBoard(gameOverString);
-		blackSocket.sendBoard(gameOverString);
+		System.out.println(gameOverString);
+		//whiteSocket.sendBoard(gameOverString);
+		//blackSocket.sendBoard(gameOverString);
 		System.exit(0);
 	}
 	public void illegalMove() {
@@ -375,8 +393,9 @@ class GPanel extends JPanel implements MouseListener {
 		else {
 			System.out.println("winner W " + (board.counter[1] - board.counter[0]) + " Illegal");
 		}
-		whiteSocket.sendBoard(gameOverString);
-		blackSocket.sendBoard(gameOverString);
+		System.out.println(gameOverString);
+		//whiteSocket.sendBoard(gameOverString);
+		//blackSocket.sendBoard(gameOverString);
 		System.exit(0);
 	}
 
@@ -388,12 +407,14 @@ class GPanel extends JPanel implements MouseListener {
 		//while(!board.gameEnd()) {
 			iswhite = !iswhite;
 
+			/*
 			if(DISPLAY.equals("text")) {
 				System.out.println(board.textBoard());
 			}
+			*/
 
 			if(iswhite) {
-			    System.out.println("IT IS WHITE'S TURN");
+			    //System.out.println("IT IS WHITE'S TURN");
 			    if(whH) {
 					inputEnabled = true;
 					
@@ -417,7 +438,7 @@ class GPanel extends JPanel implements MouseListener {
 			    }
 			}
 			else {
-			  System.out.println("IT IS BLACK'S TURN");
+			  //System.out.println("IT IS BLACK'S TURN");
 			      if(blH) {
 				inputEnabled = true;
 			      }
@@ -467,7 +488,7 @@ public class Reversi extends JFrame implements ActionListener{
 	static JLabel score_black, score_white;
 	JMenu level, theme;
 
-	public Reversi(int time, String disp, String bl, String wh) {
+	public Reversi(int time, String disp, String bl, String wh,String in, String out) {
 		super(WindowTitle);
 		
 		//System.out.println("Reversi");
@@ -478,7 +499,7 @@ public class Reversi extends JFrame implements ActionListener{
 		score_white.setForeground(Color.red);
 		score_white.setFont(new Font("Dialog", Font.BOLD, 16));
 		board = new ReversiBoard();
-		gpanel = new GPanel(board, score_black, score_white,"Classic", 3, time, disp, bl, wh);
+		gpanel = new GPanel(board, score_black, score_white,"Classic", 3, time, disp, bl, wh,in,out);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setupMenuBar();
 		gpanel.setMinimumSize(new Dimension(Reversi.Width,Reversi.Height));
@@ -756,12 +777,12 @@ public class Reversi extends JFrame implements ActionListener{
 		} catch (Exception e) { }
 
 		
-		if (args.length != 4) {
+		if (args.length != 8) {
 			System.out.println("Wrong number of arguments");
 			System.exit(0);
 		}
 		else {
-			Reversi app = new Reversi(Integer.parseInt(args[0]),args[1],args[2],args[3]);
+			Reversi app = new Reversi(Integer.parseInt(args[0]),args[1],args[2],args[3],args[4],args[5]);
 		}
 
 		

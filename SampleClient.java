@@ -12,32 +12,46 @@ public class SampleClient {
 				myColor = portNumber == 4444 ? color.black : color.white;
 
         try {
-            Socket kkSocket = new Socket(hostName, portNumber);
-            PrintWriter out = new PrintWriter(kkSocket.getOutputStream(), true);
-            BufferedReader in = new BufferedReader(
-                new InputStreamReader(kkSocket.getInputStream()));
-        
+						
+            //Socket kkSocket = new Socket(hostName, portNumber);
+            //PrintWriter out = new PrintWriter(kkSocket.getOutputStream(), true);
+            //BufferedReader in = new BufferedReader(
+                //new InputStreamReader(kkSocket.getInputStream()));
+						/* 
             BufferedReader stdIn =
                 new BufferedReader(new InputStreamReader(System.in));
-            String fromServer;
-            String fromUser;
-            while ((fromServer = in.readLine()) != null) {
+            String fromServer= "";
+            String fromUser= "";
+            while ((fromServer = stdIn.readLine()) != null) {
                 System.out.println("Server: " + fromServer);
                 if (fromServer.equals("GAME_OVER"))
                     break;
-                
-								board = new ReversiBoard(fromServer);
-								long time = System.currentTimeMillis();
-								while(System.currentTimeMillis() - time < 1000)
-									;
-                fromUser = makeMove(board);//stdIn.readLine();
+								else {
+									String[] splitted = fromServer.split(" ");
+									if((splitted[0].equals("black") && myColor == color.black) ||
+										(splitted[0].equals("white") && myColor == color.white)) {
+										
+										System.out.println("read somethign interesting");
+										board = new ReversiBoard(splitted[3]);
+										long time = System.currentTimeMillis();
+										while(System.currentTimeMillis() - time < 1000)
+											;
+										fromUser = makeMove(board);//stdIn.readLine();
+									}
+								}
                 if (fromUser != null) {
-                    System.out.println("Client: " + fromUser);
-                    out.println(fromUser);
+                    System.out.println(fromUser);
+                    //out.println(fromUser);
                 }
 								//fromServer = in.readLine();
-          }  
-        } catch (IOException e) {
+								*/
+									long time = System.currentTimeMillis();
+									while(System.currentTimeMillis() - time < 5000)
+										;
+								
+								System.out.println("2 3");
+          //}  
+        } catch (Exception e) {
             System.err.println("Couldn't get I/O for the connection to " +
                 hostName);
 	System.err.println(e.getMessage());

@@ -1,14 +1,24 @@
-#!/bin/bash
-#run the server
-java Reversi 5000 text computer computer &
+#!/bin/bash 
+# Use: run-example player1 player2
 
-sleep 1s
+# Clean out the FIFOS and processes upon exit
+trap '/bin/rm player1in player1out player2in player2out ; kill $(jobs -p)' EXIT
 
-#white player
-java SampleClient 4444 &
+# Create FIFOs for player input and output.
+# A FIFO looks like a file to other programs.
+mkfifo player1in
+mkfifo player1out
+mkfifo player2in
+mkfifo player2out
 
-sleep 1s
+# Start the player processes
+"$1" <player1in >player1out &
+"$2" <player2in >player2out &
 
-#black player
-java SampleClient 5555 &
-
+# The arguments to the gui program are file (FIFO) names.
+# It opens the "out" files for input and the "in" files for output.
+# Before reading from a FIFO, set a timer so that if the read waits
+# for too long, the read times out and the game is over.
+# When the game is over, the gui program exits, ending this script and
+# cleaning up the player processes and FIFOs.
+java Reversi 50000 text computer computer player1in player1out player2in player2out
