@@ -79,9 +79,9 @@ class GPanel extends JPanel implements MouseListener {
 			whH = true;
 		}
 		else {
-			System.out.println("white player, please connect on port 4444");
-			this.whiteSocket = new Sockets(4444);
-			System.out.println("white player connected");	
+			System.out.println("black player, please connect on port 4444");
+			this.blackSocket = new Sockets(4444);
+			System.out.println("black player connected");	
 			//WHITE = wh;
 		}
 
@@ -90,9 +90,9 @@ class GPanel extends JPanel implements MouseListener {
 			blH = true;
 		}
 		else {
-			System.out.println("black player, please connect on port 5555");
-			this.blackSocket = new Sockets(5555);
-			System.out.println("black player connected");
+			System.out.println("white player, please connect on port 5555");
+			this.whiteSocket = new Sockets(5555);
+			System.out.println("white player connected");
 			//BLACK = bl;
 		}
 	
