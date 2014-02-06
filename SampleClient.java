@@ -1,5 +1,6 @@
 import java.io.*;
 import java.net.*;
+import java.util.*;
 
 public class SampleClient {
 		static enum color{white,black};
@@ -26,6 +27,9 @@ public class SampleClient {
                     break;
                 
 								board = new ReversiBoard(fromServer);
+								long time = System.currentTimeMillis();
+								while(System.currentTimeMillis() - time < 1000)
+									;
                 fromUser = makeMove(board);//stdIn.readLine();
                 if (fromUser != null) {
                     System.out.println("Client: " + fromUser);
@@ -42,13 +46,18 @@ public class SampleClient {
     }
 
 	public static String makeMove(ReversiBoard board) {
+	ArrayList<String> moves = new ArrayList<String>();
 		for(Integer i = 0; i < 8; i++) {
 			for(Integer j =0; j < 8; j++) {
-					if ((myColor == color.black && (i < 8) && (j < 8) && (board.get(i,j) == TKind.nil) && (board.move(new Move(i,j),TKind.black) != 0)) || 
-						(myColor == color.white && (i < 8) && (j < 8) && (board.get(i,j) == TKind.nil) && (board.move(new Move(i,j),TKind.white) != 0))) 
+					if ((myColor == color.black && (board.get(i,j) == TKind.nil) && (board.checkNoMove(new Move(i,j),TKind.black) != 0)) || 
+						(myColor == color.white && (i < 8) && (j < 8) && (board.get(i,j) == TKind.nil) && (board.checkNoMove(new Move(i,j),TKind.white) != 0))) 
+					{
+					//moves.add(""+i.toString()+" "+j.toString());
 					return ""+i.toString()+" "+j.toString();
+					}
 			}
 		}
-		return "";
+		Random  rg = new Random();
+		return moves.get(rg.nextInt(moves.size()));
 	}
 }

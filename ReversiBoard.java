@@ -169,6 +169,24 @@ public class ReversiBoard {
 		else return 0;
 	}
 
+	public int checkNoMove(Move move, TKind kind) {
+		//System.out.println("RBoard: checkBoard");
+		// check increasing x
+		int j=Check(move,1,0,kind,true);
+		// check decreasing x
+		j+=Check(move,-1,0,kind,true);
+		// check increasing y
+		j+=Check(move,0,1,kind,true);
+		// check decreasing y
+		j+=Check(move,0,-1,kind,true);
+		// check diagonals
+		j+=Check(move,1,1,kind,true);
+		j+=Check(move,-1,1,kind,true);
+		j+=Check(move,1,-1,kind,true);
+		j+=Check(move,-1,-1,kind,true);
+		//if (j != 0) set(move,kind);
+		return j;
+	}
 	private int checkBoard(Move move, TKind kind) {
 		//System.out.println("RBoard: checkBoard");
 		// check increasing x

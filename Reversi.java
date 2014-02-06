@@ -75,8 +75,8 @@ class GPanel extends JPanel implements MouseListener {
 			System.exit(0);
 		}
 
-		if (wh.equals("-human")) {
-			whH = true;
+		if (bl.equals("-human")) {
+			blH = true;
 		}
 		else {
 			System.out.println("black player, please connect on port 4444");
@@ -86,8 +86,8 @@ class GPanel extends JPanel implements MouseListener {
 		}
 
 
-		if (bl.equals("-human")) {
-			blH = true;
+		if (wh.equals("-human")) {
+			whH = true;
 		}
 		else {
 			System.out.println("white player, please connect on port 5555");
@@ -177,6 +177,7 @@ class GPanel extends JPanel implements MouseListener {
 
 	public void showWinner() {
 		//System.out.println("Reversi: showWinner");
+		System.out.println(board.textBoard());
 		inputEnabled = false;
 		active = false;
 		if (board.counter[0] > board.counter[1]) {
