@@ -236,11 +236,11 @@ class GPanel extends JPanel implements MouseListener {
 					currentPlayer = blackSocket;
 					otherPlayer = whiteSocket;
 				}
-
+				currentPlayer.sendBoard(board.printBoard());
 				String input = currentPlayer.getInput();//br.readLine();
 				System.out.println("input received");
 				//currentPlayer.sendBoard(board.printBoard());
-				otherPlayer.sendBoard(board.printBoard());
+				//otherPlayer.sendBoard(board.printBoard());
 				System.out.println("board sent");
 
 				//process numbers
@@ -501,7 +501,7 @@ public class Reversi extends JFrame implements ActionListener{
 
 		setResizable(false);
 
-		gpanel.blackSocket.sendBoard(gpanel.board.printBoard());
+		//gpanel.blackSocket.sendBoard(gpanel.board.printBoard());
 		gpanel.run();
 	}
 
