@@ -51,7 +51,7 @@ class GPanel extends JPanel implements MouseListener {
 	public boolean iswhite = true;
 	public String gameOverString = "GAME_OVER";
 
-	ReversiBoard board;
+	public ReversiBoard board;
 	int gameLevel;
 	ImageIcon button_black, button_white;
 	JLabel score_black, score_white;
@@ -239,7 +239,7 @@ class GPanel extends JPanel implements MouseListener {
 
 				String input = currentPlayer.getInput();//br.readLine();
 				System.out.println("input received");
-				currentPlayer.sendBoard(board.printBoard());
+				//currentPlayer.sendBoard(board.printBoard());
 				otherPlayer.sendBoard(board.printBoard());
 				System.out.println("board sent");
 
@@ -501,7 +501,7 @@ public class Reversi extends JFrame implements ActionListener{
 
 		setResizable(false);
 
-
+		gpanel.blackSocket.sendBoard(gpanel.board.printBoard());
 		gpanel.run();
 	}
 

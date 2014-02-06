@@ -34,6 +34,22 @@ public class ReversiBoard {
 		clear();	
 	}
 
+	public ReversiBoard(String inputBoard) {
+		clear();
+		int i = 0;
+		int j = 0;
+		String[] inputSplit = inputBoard.split(",");
+		for(String c : inputSplit) {
+			if(c.equals("black"))
+				this.board[i][j] = TKind.black;
+			else if(c.equals("white"))
+				this.board[i][j] = TKind.white;
+			j++;
+			if(j > 7){j = 0; i++;}
+		}
+		System.out.println(this.textBoard());
+	}
+
 	public TKind get(int i, int j) {
 		//System.out.println("TKind: get");
 		return board[i][j];
@@ -73,11 +89,11 @@ public class ReversiBoard {
 
 	public String printBoard() {
 		String toReturn = "";
-		toReturn += "[";
+		//toReturn += "[";
 		for (int i = 0 ; i < 8 ; i++) {
 			for (int j = 0 ; j < 8 ; j++)
 				toReturn += board[i][j]+",";
-			toReturn += (i == 7? "]":"");
+			//toReturn += (i == 7? "]":"");
 			}
 			return toReturn;
 	}
