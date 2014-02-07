@@ -226,7 +226,7 @@ class GPanel extends JPanel implements MouseListener {
 
 
 	public void computerMove() {
-		//System.out.println("GPanel: computerMove");
+		paintImmediately(0, 0, Reversi.Width, Reversi.Height);
 		repaint();
 		Integer i = 0;
 		boolean validInput;
