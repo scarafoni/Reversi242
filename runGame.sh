@@ -17,4 +17,4 @@
 # for too long, the read times out and the game is over.
 # When the game is over, the gui program exits, ending this script and
 # cleaning up the player processes and FIFOs.
-java Reversi 50000 text computer computer "$1" "$2"
+java Reversi "$1" "$2" "$3" "$4"

@@ -62,7 +62,7 @@ class GPanel extends JPanel implements MouseListener {
 	Move hint=null;
 	boolean inputEnabled, active;
 
-	public GPanel (ReversiBoard board, JLabel score_black, JLabel score_white, String theme, int level, int ti, String disp, String bl, String wh,String blackProgram,String whiteProgram) {
+	public GPanel (ReversiBoard board, JLabel score_black, JLabel score_white, String theme, int level, int ti, String disp, String blackProgram,String whiteProgram) {
 		super();
 		this.board = board;
 		this.score_black = score_black;
@@ -70,6 +70,7 @@ class GPanel extends JPanel implements MouseListener {
 
 		Runtime runtime = Runtime.getRuntime();
 		Process blackPlayer, whitePlayer;
+		/*
 		try{
 			blackPlayer = runtime.exec(blackProgram);
 			whitePlayer = runtime.exec(whiteProgram);
@@ -80,19 +81,34 @@ class GPanel extends JPanel implements MouseListener {
 
 		}catch(IOException e){System.exit(1);}
 		//System.out.println("done initing readers");
+		*/
 		TIMELIMIT = ti;
 		DISPLAY = disp;
 		
-		if((bl.equals("-human") || wh.equals("-human")) && !disp.equals("gui")) {
+		if((blackProgram.equals("-human") || whiteProgram.equals("-human")) && !disp.equals("gui")) {
 			System.out.println("Need gui for human players");
 			System.exit(0);
 		}
 
-		if (bl.equals("-human")) {
+		if (blackProgram.equals("-human")) {
 			blH = true;
 		}
-		if (wh.equals("-human")) {
+		else {
+			try {
+				blackPlayer = runtime.exec(blackProgram);
+				this.blackOut = new BufferedReader(new InputStreamReader(blackPlayer.getInputStream()));
+				this.blackIn = new BufferedWriter(new OutputStreamWriter(blackPlayer.getOutputStream()));
+			}catch(Exception e){System.out.println("black's io isn't working");}
+		}
+		if (whiteProgram.equals("-human")) {
 			whH = true;
+		}
+		else {
+			try {
+				whitePlayer = runtime.exec(whiteProgram);
+				this.whiteOut = new BufferedReader(new InputStreamReader(whitePlayer.getInputStream()));
+				this.whiteIn = new BufferedWriter(new OutputStreamWriter(whitePlayer.getOutputStream()));
+			}catch(Exception e){System.out.println("white's io isn't working");}
 		}
 		
 		gameLevel = level;
@@ -126,7 +142,7 @@ class GPanel extends JPanel implements MouseListener {
 	}
 
 	public void drawPanel(Graphics g) {
-		//System.out.println("GPanel: drawPanel");
+	//	System.out.println("GPanel: drawPanel");
 //	    int currentWidth = getWidth();
 //		int currentHeight = getHeight();
 		for (int i = 1 ; i < 8 ; i++) {
@@ -211,6 +227,7 @@ class GPanel extends JPanel implements MouseListener {
 
 	public void computerMove() {
 		//System.out.println("GPanel: computerMove");
+		repaint();
 		Integer i = 0;
 		boolean validInput;
 		Integer j = 0;
@@ -245,7 +262,7 @@ class GPanel extends JPanel implements MouseListener {
 				}
 					System.out.println("read input: "+input);
 					
-				System.out.println(board.textBoard());
+				//System.out.println(board.textBoard());
 
 				//process numbers
 				String[] inputSplit = input.split(" ");
@@ -268,7 +285,7 @@ class GPanel extends JPanel implements MouseListener {
 		
 		score_black.setText(Integer.toString(board.getCounter(TKind.black)));
 		score_white.setText(Integer.toString(board.getCounter(TKind.white)));
-		repaint();
+		//repaint();
 
 		if (board.gameEnd()) 
 			showWinner();
@@ -302,11 +319,12 @@ class GPanel extends JPanel implements MouseListener {
 			if ((!iswhite && (i < 8) && (j < 8) && (board.get(i,j) == TKind.nil) && (board.move(new Move(i,j),TKind.black) != 0)) || (iswhite && (i < 8) && (j < 8) && (board.get(i,j) == TKind.nil) && (board.move(new Move(i,j),TKind.white) != 0))) {
 				score_black.setText(Integer.toString(board.getCounter(TKind.black)));
 				score_white.setText(Integer.toString(board.getCounter(TKind.white)));
+				//repaint();
 				moved = true;
-				inputEnabled = false;
-				repaint();						
+				inputEnabled = false;						
 				javax.swing.SwingUtilities.invokeLater(new Runnable() {
 					public void run() {	
+						
 						Cursor savedCursor = getCursor();
 						setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));				
 						
@@ -388,16 +406,16 @@ class GPanel extends JPanel implements MouseListener {
 
 	public void run() {
 		inputEnabled = false;
+		repaint();
+		
 		//System.out.println("GPanel: run");
 
 		//while(!board.gameEnd()) {
 			iswhite = !iswhite;
 
-			/*
 			if(DISPLAY.equals("text")) {
 				System.out.println(board.textBoard());
 			}
-			*/
 
 			if(iswhite) {
 			    System.out.println("IT IS WHITE'S TURN");
@@ -474,7 +492,7 @@ public class Reversi extends JFrame implements ActionListener{
 	static JLabel score_black, score_white;
 	JMenu level, theme;
 
-	public Reversi(int time, String disp, String bl, String wh,String blackProgram, String whiteProgram) {
+	public Reversi(int time, String disp,String blackProgram, String whiteProgram) {
 		super(WindowTitle);
 		
 		//System.out.println("Reversi");
@@ -485,7 +503,7 @@ public class Reversi extends JFrame implements ActionListener{
 		score_white.setForeground(Color.red);
 		score_white.setFont(new Font("Dialog", Font.BOLD, 16));
 		board = new ReversiBoard();
-		gpanel = new GPanel(board, score_black, score_white,"Classic", 3, time, disp, bl, wh,blackProgram,whiteProgram);
+		gpanel = new GPanel(board, score_black, score_white,"Classic", 3, time, disp,blackProgram,whiteProgram);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setupMenuBar();
 		gpanel.setMinimumSize(new Dimension(Reversi.Width,Reversi.Height));
@@ -763,12 +781,12 @@ public class Reversi extends JFrame implements ActionListener{
 		} catch (Exception e) { }
 
 		
-		if (args.length != 6) {
+		if (args.length != 4) {
 			System.out.println("Wrong number of arguments");
 			System.exit(0);
 		}
 		else {
-			Reversi app = new Reversi(Integer.parseInt(args[0]),args[1],args[2],args[3],args[4],args[5]);
+			Reversi app = new Reversi(Integer.parseInt(args[0]),args[1],args[2],args[3]);
 		}
 
 		
