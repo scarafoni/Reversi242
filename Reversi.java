@@ -62,9 +62,8 @@ class GPanel extends JPanel implements MouseListener {
 	Move hint=null;
 	boolean inputEnabled, active;
 
-	public GPanel (ReversiBoard board, JLabel score_black, JLabel score_white, String theme, int level, int ti, String disp, String bl, String wh,String bin, String bout,String win, String wout) {
+	public GPanel (ReversiBoard board, JLabel score_black, JLabel score_white, String theme, int level, int ti, String disp, String bl, String wh,String blackProgram,String whiteProgram) {
 		super();
-		//System.out.println("GPanel");
 		this.board = board;
 		this.score_black = score_black;
 		this.score_white = score_white;
@@ -72,27 +71,13 @@ class GPanel extends JPanel implements MouseListener {
 		Runtime runtime = Runtime.getRuntime();
 		Process blackPlayer, whitePlayer;
 		try{
-			blackPlayer = runtime.exec("java SampleClient 4444");
-			whitePlayer = runtime.exec("java SampleClient 5555");
-		
-			//System.out.println("init readers");
+			blackPlayer = runtime.exec(blackProgram);
+			whitePlayer = runtime.exec(whiteProgram);
 			this.blackOut = new BufferedReader(new InputStreamReader(blackPlayer.getInputStream()));
-			//System.out.println("1");
 			this.blackIn = new BufferedWriter(new OutputStreamWriter(blackPlayer.getOutputStream()));
-			//System.out.println("2");
 			this.whiteOut = new BufferedReader(new InputStreamReader(whitePlayer.getInputStream()));
-			//System.out.println("3");
 			this.whiteIn = new BufferedWriter(new OutputStreamWriter(whitePlayer.getOutputStream()));
-			/*
-			//System.out.println("init readers");
-			this.blackOut = new BufferedReader(new FileReader(bout));
-			//System.out.println("1");
-			this.blackIn = new BufferedWriter(new FileWriter(bin));
-			//System.out.println("2");
-			this.whiteOut = new BufferedReader(new FileReader(wout));
-			//System.out.println("3");
-			this.whiteIn = new BufferedWriter(new FileWriter(win));
-			*/
+
 		}catch(IOException e){System.exit(1);}
 		//System.out.println("done initing readers");
 		TIMELIMIT = ti;
@@ -105,26 +90,10 @@ class GPanel extends JPanel implements MouseListener {
 
 		if (bl.equals("-human")) {
 			blH = true;
-		}/*
-		else {
-		
-			System.out.println("black player, please connect on port 4444");
-			this.blackSocket = new Sockets(4444);
-			System.out.println("black player connected");	
-			//WHITE = wh;
 		}
-
-		*/
 		if (wh.equals("-human")) {
 			whH = true;
 		}
-		/*else {
-			System.out.println("white player, please connect on port 5555");
-			this.whiteSocket = new Sockets(5555);
-			System.out.println("white player connected");
-			//BLACK = bl;
-		}
-		*/	
 		
 		gameLevel = level;
 		setTheme(theme);
@@ -268,7 +237,6 @@ class GPanel extends JPanel implements MouseListener {
 				}
 				currentIn.write(currentPlayer+ " please move "+board.printBoard()+"\n");
 				currentIn.flush();
-				System.out.println(currentPlayer+ " please move "+board.printBoard()+"\n");
 				try {
 						input = currentOut.readLine();
 					
@@ -506,7 +474,7 @@ public class Reversi extends JFrame implements ActionListener{
 	static JLabel score_black, score_white;
 	JMenu level, theme;
 
-	public Reversi(int time, String disp, String bl, String wh,String bin, String bout, String win, String wout) {
+	public Reversi(int time, String disp, String bl, String wh,String blackProgram, String whiteProgram) {
 		super(WindowTitle);
 		
 		//System.out.println("Reversi");
@@ -517,7 +485,7 @@ public class Reversi extends JFrame implements ActionListener{
 		score_white.setForeground(Color.red);
 		score_white.setFont(new Font("Dialog", Font.BOLD, 16));
 		board = new ReversiBoard();
-		gpanel = new GPanel(board, score_black, score_white,"Classic", 3, time, disp, bl, wh,bin,bout,win,wout);
+		gpanel = new GPanel(board, score_black, score_white,"Classic", 3, time, disp, bl, wh,blackProgram,whiteProgram);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setupMenuBar();
 		gpanel.setMinimumSize(new Dimension(Reversi.Width,Reversi.Height));
@@ -795,12 +763,12 @@ public class Reversi extends JFrame implements ActionListener{
 		} catch (Exception e) { }
 
 		
-		if (args.length != 8) {
+		if (args.length != 6) {
 			System.out.println("Wrong number of arguments");
 			System.exit(0);
 		}
 		else {
-			Reversi app = new Reversi(Integer.parseInt(args[0]),args[1],args[2],args[3],args[4],args[5],args[6],args[7]);
+			Reversi app = new Reversi(Integer.parseInt(args[0]),args[1],args[2],args[3],args[4],args[5]);
 		}
 
 		
