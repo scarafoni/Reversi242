@@ -46,15 +46,13 @@ class GPanel extends JPanel implements MouseListener {
 	public boolean blH = false;
 	public String BLACK;
 	public String WHITE;
-	//public Sockets whiteSocket;
-	//public Sockets blackSocket;
 	public boolean iswhite = true;
 	public String gameOverString = "GAME_OVER";
 
-	BufferedWriter blackOut;
-	BufferedReader blackIn;
-	BufferedWriter whiteOut;
-	BufferedReader whiteIn;
+	BufferedWriter blackIn;
+	BufferedReader blackOut;
+	BufferedWriter whiteIn;
+	BufferedReader whiteOut;
 
 	public ReversiBoard board;
 	int gameLevel;
@@ -70,17 +68,33 @@ class GPanel extends JPanel implements MouseListener {
 		this.board = board;
 		this.score_black = score_black;
 		this.score_white = score_white;
+
+		Runtime runtime = Runtime.getRuntime();
+		Process blackPlayer, whitePlayer;
 		try{
-			System.out.println("init readers");
-			this.blackIn = new BufferedReader(new FileReader(bin));
-			System.out.println("1");
-			this.blackOut = new BufferedWriter(new FileWriter(bout));
-			System.out.println("2");
-			this.whiteOut = new BufferedWriter(new FileWriter(wout));
-			System.out.println("3");
-			this.whiteIn = new BufferedReader(new FileReader(win));
-		}catch(IOException e){System.out.println("error");}
-		System.out.println("done initing readers");
+			blackPlayer = runtime.exec("java SampleClient 4444");
+			whitePlayer = runtime.exec("java SampleClient 5555");
+		
+			//System.out.println("init readers");
+			this.blackOut = new BufferedReader(new InputStreamReader(blackPlayer.getInputStream()));
+			//System.out.println("1");
+			this.blackIn = new BufferedWriter(new OutputStreamWriter(blackPlayer.getOutputStream()));
+			//System.out.println("2");
+			this.whiteOut = new BufferedReader(new InputStreamReader(whitePlayer.getInputStream()));
+			//System.out.println("3");
+			this.whiteIn = new BufferedWriter(new OutputStreamWriter(whitePlayer.getOutputStream()));
+			/*
+			//System.out.println("init readers");
+			this.blackOut = new BufferedReader(new FileReader(bout));
+			//System.out.println("1");
+			this.blackIn = new BufferedWriter(new FileWriter(bin));
+			//System.out.println("2");
+			this.whiteOut = new BufferedReader(new FileReader(wout));
+			//System.out.println("3");
+			this.whiteIn = new BufferedWriter(new FileWriter(win));
+			*/
+		}catch(IOException e){System.exit(1);}
+		//System.out.println("done initing readers");
 		TIMELIMIT = ti;
 		DISPLAY = disp;
 		
@@ -229,28 +243,14 @@ class GPanel extends JPanel implements MouseListener {
 	public void computerMove() {
 		//System.out.println("GPanel: computerMove");
 		Integer i = 0;
+		boolean validInput;
 		Integer j = 0;
-		try { 
-			boolean validInput = false;
-			/*
-				if(iswhite) {
-					currentPlayer = whiteSocket;
-					otherPlayer = blackSocket;
-				}
-				else {
-					currentPlayer = blackSocket;
-					otherPlayer = whiteSocket;
-				}
-				currentPlayer.sendBoard(board.printBoard());
-				String input = currentPlayer.getInput();//br.readLine();
-				System.out.println("input received");
-				System.out.println("board sent");
-				*/
-				String input = "";
-				BufferedReader currentIn;
-				BufferedWriter currentOut;
-				BufferedReader otherIn;
-				BufferedWriter otherOut;
+		try {
+				String input = null;
+				BufferedWriter currentIn;
+				BufferedReader currentOut;
+				BufferedWriter otherIn;
+				BufferedReader otherOut;
 				String currentPlayer;
 				if(iswhite) {
 					currentPlayer = "white";
@@ -266,15 +266,18 @@ class GPanel extends JPanel implements MouseListener {
 					otherIn = whiteIn;
 					otherOut = whiteOut;
 				}
-				System.out.println(currentPlayer+ " please move "+board.printBoard());
+				currentIn.write(currentPlayer+ " please move "+board.printBoard()+"\n");
+				currentIn.flush();
+				System.out.println(currentPlayer+ " please move "+board.printBoard()+"\n");
 				try {
-					input=currentIn.readLine();
-					System.out.println("read");
-					currentOut.write("stuff");
-
+						input = currentOut.readLine();
+					
 				}catch(Exception io) {
-					io.printStackTrace();
+					System.exit(1);
 				}
+					System.out.println("read input: "+input);
+					
+				System.out.println(board.textBoard());
 
 				//process numbers
 				String[] inputSplit = input.split(" ");
@@ -293,7 +296,7 @@ class GPanel extends JPanel implements MouseListener {
 					illegalMove();
 					//validInput = false;
 				}
-		}catch(Exception e) {e.printStackTrace();}
+		}catch(Exception e) {System.exit(1);}
 		
 		score_black.setText(Integer.toString(board.getCounter(TKind.black)));
 		score_white.setText(Integer.toString(board.getCounter(TKind.white)));
@@ -429,7 +432,7 @@ class GPanel extends JPanel implements MouseListener {
 			*/
 
 			if(iswhite) {
-			    //System.out.println("IT IS WHITE'S TURN");
+			    System.out.println("IT IS WHITE'S TURN");
 			    if(whH) {
 					inputEnabled = true;
 					
@@ -453,7 +456,7 @@ class GPanel extends JPanel implements MouseListener {
 			    }
 			}
 			else {
-			  //System.out.println("IT IS BLACK'S TURN");
+			  System.out.println("IT IS BLACK'S TURN");
 			      if(blH) {
 				inputEnabled = true;
 			      }

@@ -47,7 +47,7 @@ public class ReversiBoard {
 			j++;
 			if(j > 7){j = 0; i++;}
 		}
-		System.out.println(this.textBoard());
+		//System.out.println(this.textBoard());
 	}
 
 	public TKind get(int i, int j) {
