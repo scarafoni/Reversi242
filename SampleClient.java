@@ -45,6 +45,7 @@ public class SampleClient {
                 }
 								//fromServer = in.readLine();
 								*/
+								System.out.println("about to print");
 									long time = System.currentTimeMillis();
 									while(System.currentTimeMillis() - time < 5000)
 										;

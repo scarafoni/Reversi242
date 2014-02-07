@@ -72,14 +72,14 @@ class GPanel extends JPanel implements MouseListener {
 		this.score_white = score_white;
 		try{
 			System.out.println("init readers");
-			this.blackOut = new BufferedWriter(new FileWriter(bout));
-			System.out.println("1");
 			this.blackIn = new BufferedReader(new FileReader(bin));
+			System.out.println("1");
+			this.blackOut = new BufferedWriter(new FileWriter(bout));
 			System.out.println("2");
 			this.whiteOut = new BufferedWriter(new FileWriter(wout));
 			System.out.println("3");
 			this.whiteIn = new BufferedReader(new FileReader(win));
-		}catch(IOException e){e.printStackTrace();}
+		}catch(IOException e){System.out.println("error");}
 		System.out.println("done initing readers");
 		TIMELIMIT = ti;
 		DISPLAY = disp;
