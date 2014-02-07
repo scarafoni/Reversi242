@@ -191,7 +191,8 @@ class GPanel extends JPanel implements MouseListener {
 
 	public void showWinner() {
 		//System.out.println("Reversi: showWinner");
-		System.out.println(board.textBoard());
+		if(DISPLAY.equals("text"))
+			System.out.println(board.textBoard());
 		inputEnabled = false;
 		active = false;
 		if (board.counter[0] > board.counter[1]) {

@@ -8,8 +8,7 @@ public class SampleClient {
     public static void main(String[] args) throws IOException {
         String hostName = "localhost";
 				ReversiBoard board;
-        int portNumber = Integer.parseInt(args[0]);
-				myColor = portNumber == 4444 ? color.black : color.white;
+				myColor =  args[0].equals("black") ? color.black : color.white;
 
         try {
             BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in));
@@ -24,7 +23,7 @@ public class SampleClient {
 								
 								board = new ReversiBoard(splitted[3]);
 								long time = System.currentTimeMillis();
-								while(System.currentTimeMillis() - time < 5000)
+								while(System.currentTimeMillis() - time < 1000)
 									;
 								fromUser = makeMove(board);
 								System.out.println(fromUser);
