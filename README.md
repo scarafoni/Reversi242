@@ -12,9 +12,6 @@ Instructions for running:
 =========================
 	to start, type the folowing
 	tournament GUI BLACKPLAYER WHITEPLAYER DEPTHLIMIT TIMELIMIT TIMELIMIT2
-
-	example: ./tournament gui "java SampleClient white" "java SampleClient black" 4 50000 0
-		 ./tournament text "./SampleCClient white" "java SampleJavaClient black" 10 50000 100000000
 	
 	GUI is one of the following strings:
 	gui 	Display the game graphically (using X windows and the DISPLAY environmental variable).
@@ -23,6 +20,8 @@ Instructions for running:
 
 	Each of BLACKPLAYER and WHITEPLAYER is either the flag -human or the name of a player program directory (including the path if not in the working directory). If a player is human the player either uses the gui to enter her moves, or in the case of text display types her moves as pairs of integers to stdin after receiving a prompt. TIMELIMITs are not enforced for human players. For program players, the tournament program runs them and interacts with them via stdin and stdout as described above.
 
+	example: ./tournament gui blackPlayer whitePlayer 4 50000 0
+	
 	At the end of the game, the tournament program prints a single line to stdout of the form:
 
 	winner COLOR ADVANTAGE REASON
