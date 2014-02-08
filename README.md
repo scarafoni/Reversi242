@@ -32,8 +32,9 @@ Instructions for running:
 Note that in the came of timeout or illegal, ADVANTAGE might be negative.	
 		where:
 
-		the sample client file only takes on argument, a string, either "black" or "white" specifying which color the player is. is very rudimentary, and as such has no support for depth limit, and you'll have to adjust the source code to modify how long it takes to make a move. Black is player 1, white is player 2
-	-you can use the run.sh script to quickly run the whole program, it takes the same arguments as the server file
+		the sample client file only takes on argument, a string, either "black" or "white" specifying which color the player is. 
+		It is very rudimentary, and as such has no support for depth limit, and you'll have to adjust the source code to modify how long it takes to make a move. 
+		Black is player 1, white is player 2
 
 What can I do to make my own othello-player?
 ============================================
