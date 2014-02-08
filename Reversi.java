@@ -40,7 +40,9 @@ class GPanel extends JPanel implements MouseListener {
 
 
 	
-	public int TIMELIMIT;
+	public int time1;
+	public int time2;
+	public int depth;
 	public String DISPLAY;
 	public boolean whH = false;
 	public boolean blH = false;
@@ -61,8 +63,7 @@ class GPanel extends JPanel implements MouseListener {
 	String gameTheme;
 	Move hint=null;
 	boolean inputEnabled, active;
-
-	public GPanel (ReversiBoard board, JLabel score_black, JLabel score_white, String theme, int level, int ti, String disp, String blackProgram,String whiteProgram) {
+	public GPanel (ReversiBoard board, JLabel score_black, JLabel score_white, String theme, int level, String disp, String blackProgram,String whiteProgram, int t1, int t2, int de) {
 		super();
 		this.board = board;
 		this.score_black = score_black;
@@ -82,7 +83,9 @@ class GPanel extends JPanel implements MouseListener {
 		}catch(IOException e){System.exit(1);}
 		//System.out.println("done initing readers");
 		*/
-		TIMELIMIT = ti;
+		time1 = t1;
+		time2 = t2;
+		depth = de;
 		DISPLAY = disp;
 		
 		if((blackProgram.equals("-human") || whiteProgram.equals("-human")) && !disp.equals("gui")) {
@@ -95,7 +98,7 @@ class GPanel extends JPanel implements MouseListener {
 		}
 		else {
 			try {
-				blackPlayer = runtime.exec(blackProgram);
+				blackPlayer = runtime.exec(blackProgram+"/play");
 				this.blackOut = new BufferedReader(new InputStreamReader(blackPlayer.getInputStream()));
 				this.blackIn = new BufferedWriter(new OutputStreamWriter(blackPlayer.getOutputStream()));
 			}catch(Exception e){System.out.println("black's io isn't working");}
@@ -105,7 +108,7 @@ class GPanel extends JPanel implements MouseListener {
 		}
 		else {
 			try {
-				whitePlayer = runtime.exec(whiteProgram);
+				whitePlayer = runtime.exec(whiteProgram+"/play");
 				this.whiteOut = new BufferedReader(new InputStreamReader(whitePlayer.getInputStream()));
 				this.whiteIn = new BufferedWriter(new OutputStreamWriter(whitePlayer.getOutputStream()));
 			}catch(Exception e){System.out.println("white's io isn't working");}
@@ -253,7 +256,12 @@ class GPanel extends JPanel implements MouseListener {
 					otherIn = whiteIn;
 					otherOut = whiteOut;
 				}
-				currentIn.write(currentPlayer+ " please move "+board.printBoard()+"\n");
+				String writeout = board.printBoard();
+				if(iswhite) writeout+= " W";
+				else writeout+= " B";
+				writeout+= " " + depth + " " + time1 + " " +time2;
+				currentIn.write(writeout+"\n");
+				//System.out.println(writeout);
 				currentIn.flush();
 				try {
 						input = currentOut.readLine();
@@ -261,7 +269,8 @@ class GPanel extends JPanel implements MouseListener {
 				}catch(Exception io) {
 					System.exit(1);
 				}
-					System.out.println("read input: "+input);
+					if(!DISPLAY.equals("none"))
+						System.out.println("read input: "+input);
 					
 				//System.out.println(board.textBoard());
 
@@ -278,7 +287,8 @@ class GPanel extends JPanel implements MouseListener {
 					else 
 						illegalMove();
 				}catch(NumberFormatException e) {
-					System.out.println("poorly formatted input");
+					if(!DISPLAY.equals("none"))
+						System.out.println("poorly formatted input");
 					illegalMove();
 					//validInput = false;
 				}
@@ -292,11 +302,13 @@ class GPanel extends JPanel implements MouseListener {
 			showWinner();
 
 		if (iswhite && !board.userCanMove(TKind.black)) {
-			System.out.println("black cant move");
+			if(!DISPLAY.equals("none"))			
+				System.out.println("black cant move");
 			showWinner();
 		}
 		if (!iswhite && !board.userCanMove(TKind.white)) {
-			System.out.println("white cant move");
+			if(!DISPLAY.equals("none"))
+				System.out.println("white cant move");
 			showWinner();
 		}
 		run();
@@ -373,10 +385,7 @@ class GPanel extends JPanel implements MouseListener {
 
 
 	public boolean moved = false;
-	
-	public int getTime() {
-		return TIMELIMIT;
-	}
+
 
 
 	public void timeup() {
@@ -419,49 +428,53 @@ class GPanel extends JPanel implements MouseListener {
 			}
 
 			if(iswhite) {
-			    System.out.println("IT IS WHITE'S TURN");
+				if(!DISPLAY.equals("none"))
+			   		 System.out.println("IT IS WHITE'S TURN");
 			    if(whH) {
 					inputEnabled = true;
 					
 			    }
 			    else {
-				final Runnable stuffToDo = new Thread() {
-					@Override public void run() {computerMove();}
-				};
-				final ExecutorService executor = Executors.newSingleThreadExecutor();
-				final Future future = executor.submit(stuffToDo);
-				executor.shutdown();
-				try { future.get(TIMELIMIT, TimeUnit.MILLISECONDS); }
-				catch (InterruptedException ie) {System.out.println(ie.getMessage());System.exit(0); }
-				catch (TimeoutException te) { timeup();}
-				catch (ExecutionException ee) { System.out.println(ee.getMessage());System.exit(0);}
-				if (!executor.isTerminated())
-				executor.shutdownNow();
-
-				    //computerMove();
+				if(time1!=0) {
+					final Runnable stuffToDo = new Thread() {
+						@Override public void run() {computerMove();}
+					};
+					final ExecutorService executor = Executors.newSingleThreadExecutor();
+					final Future future = executor.submit(stuffToDo);
+					executor.shutdown();
+					try { future.get(time1, TimeUnit.MILLISECONDS); }
+					catch (InterruptedException ie) {System.out.println(ie.getMessage());System.exit(0); }
+					catch (TimeoutException te) { timeup();}
+					catch (ExecutionException ee) { System.out.println(ee.getMessage());System.exit(0);}
+					if (!executor.isTerminated())
+					executor.shutdownNow();
+				}
+				else {computerMove();}
 
 			    }
 			}
 			else {
-			  System.out.println("IT IS BLACK'S TURN");
+			if(!DISPLAY.equals("none"))
+				  System.out.println("IT IS BLACK'S TURN");
 			      if(blH) {
 				inputEnabled = true;
 			      }
 			      else {
-
-				final Runnable stuffToDo = new Thread() {
-					@Override public void run(){ computerMove();}
-				};
-				final ExecutorService executor = Executors.newSingleThreadExecutor();
-				final Future future = executor.submit(stuffToDo);
-				executor.shutdown();
-				try { future.get(TIMELIMIT, TimeUnit.MILLISECONDS); }
-				catch (InterruptedException ie) { System.out.println(ie.getMessage());System.exit(0);}
-				catch (TimeoutException te) { timeup();}
-				catch (ExecutionException ee) { System.out.println(ee.getMessage());System.exit(0);}
-				if (!executor.isTerminated())
-				executor.shutdownNow();
-				     // computerMove();
+				if(time1!=0) {
+					final Runnable stuffToDo = new Thread() {
+						@Override public void run(){ computerMove();}
+					};
+					final ExecutorService executor = Executors.newSingleThreadExecutor();
+					final Future future = executor.submit(stuffToDo);
+					executor.shutdown();
+					try { future.get(time1, TimeUnit.MILLISECONDS); }
+					catch (InterruptedException ie) { System.out.println(ie.getMessage());System.exit(0);}
+					catch (TimeoutException te) { timeup();}
+					catch (ExecutionException ee) { System.out.println(ee.getMessage());System.exit(0);}
+					if (!executor.isTerminated())
+					executor.shutdownNow();
+				}
+				else {computerMove();}
 			      }
 			}
 		//}
@@ -493,7 +506,7 @@ public class Reversi extends JFrame implements ActionListener{
 	static JLabel score_black, score_white;
 	JMenu level, theme;
 
-	public Reversi(int time, String disp,String blackProgram, String whiteProgram) {
+	public Reversi(String disp,String blackProgram, String whiteProgram, int depth, int time1, int time2) {
 		super(WindowTitle);
 		
 		//System.out.println("Reversi");
@@ -504,7 +517,7 @@ public class Reversi extends JFrame implements ActionListener{
 		score_white.setForeground(Color.red);
 		score_white.setFont(new Font("Dialog", Font.BOLD, 16));
 		board = new ReversiBoard();
-		gpanel = new GPanel(board, score_black, score_white,"Classic", 3, time, disp,blackProgram,whiteProgram);
+		gpanel = new GPanel(board, score_black, score_white,"Classic", 3, disp,blackProgram,whiteProgram, time1, time2, depth);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setupMenuBar();
 		gpanel.setMinimumSize(new Dimension(Reversi.Width,Reversi.Height));
@@ -782,12 +795,12 @@ public class Reversi extends JFrame implements ActionListener{
 		} catch (Exception e) { }
 
 		
-		if (args.length != 4) {
+		if (args.length != 6) {
 			System.out.println("Wrong number of arguments");
 			System.exit(0);
 		}
 		else {
-			Reversi app = new Reversi(Integer.parseInt(args[0]),args[1],args[2],args[3]);
+			Reversi app = new Reversi(args[0],args[1],args[2],Integer.parseInt(args[3]), Integer.parseInt(args[4]), Integer.parseInt(args[5]));
 		}
 
 		

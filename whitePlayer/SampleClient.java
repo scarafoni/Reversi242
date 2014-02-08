@@ -16,10 +16,10 @@ public class SampleClient {
             String fromUser= "";
 						//System.out.println("outside the loop");
             while ((fromServer = stdIn.readLine()) != "GAME_OVER") {
-							//System.out.println(fromServer);
+							//System.out.println("in the loop");
 							String[] splitted = fromServer.split(" ");
-							if((splitted[1].equals("B") && myColor == color.black) ||
-								(splitted[1].equals("W") && myColor == color.white)) {
+							if((splitted[1].equals("black") && myColor == color.black) ||
+								(splitted[1].equals("white") && myColor == color.white)) {
 								
 								board = new ReversiBoard(splitted[0]);
 								long time = System.currentTimeMillis();
