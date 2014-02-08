@@ -261,11 +261,11 @@ class GPanel extends JPanel implements MouseListener {
 				if(iswhite) writeout+= " W";
 				else writeout+= " B";
 				writeout+= " " + depth + " " + time1 + " " +time2;
-				currentIn.write(writeout+" \n");
-				//System.out.println(writeout);
+				currentIn.write(writeout+"\n");
+				System.out.println(writeout);
 				currentIn.flush();
 				try {
-						//System.out.println("about to read input");
+						System.out.println("about to read input");
 						input = currentOut.readLine();
 					
 				}catch(Exception io) {
@@ -295,7 +295,10 @@ class GPanel extends JPanel implements MouseListener {
 					illegalMove();
 					//validInput = false;
 				}
-		}catch(Exception e) {System.exit(1);}
+		}catch(Exception e) {
+			e.printStackTrace();
+			System.exit(1); 
+			}
 		
 		score_black.setText(Integer.toString(board.getCounter(TKind.black)));
 		score_white.setText(Integer.toString(board.getCounter(TKind.white)));

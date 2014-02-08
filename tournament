@@ -17,4 +17,4 @@
 # for too long, the read times out and the game is over.
 # When the game is over, the gui program exits, ending this script and
 # cleaning up the player processes and FIFOs.
-java Reversi "$1" "$2" "$3" "$4" "$5" "$6"
+java -jar Reversi.jar "$1" "$2" "$3" "$4" "$5" "$6"
