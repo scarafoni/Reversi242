@@ -233,6 +233,7 @@ class GPanel extends JPanel implements MouseListener {
 		paintImmediately(0, 0, Reversi.Width, Reversi.Height);
 		repaint();
 		Integer i = 0;
+		//System.out.println("in computerMove");
 		boolean validInput;
 		Integer j = 0;
 		try {
@@ -260,13 +261,15 @@ class GPanel extends JPanel implements MouseListener {
 				if(iswhite) writeout+= " W";
 				else writeout+= " B";
 				writeout+= " " + depth + " " + time1 + " " +time2;
-				currentIn.write(writeout+"\n");
+				currentIn.write(writeout+" \n");
 				//System.out.println(writeout);
 				currentIn.flush();
 				try {
+						//System.out.println("about to read input");
 						input = currentOut.readLine();
 					
 				}catch(Exception io) {
+					System.out.println("couldn't read input");
 					System.exit(1);
 				}
 					if(!DISPLAY.equals("none"))
