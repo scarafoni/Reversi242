@@ -425,12 +425,14 @@ class GPanel extends JPanel implements MouseListener {
 
 		//while(!board.gameEnd()) {
 			iswhite = !iswhite;
+			int currentTimeout = time1;
 
 			if(DISPLAY.equals("text")) {
 				System.out.println(board.textBoard());
 			}
 
 			if(iswhite) {
+				currentTimeout = time2;
 				if(!DISPLAY.equals("none"))
 			   		 System.out.println("IT IS WHITE'S TURN");
 			    if(whH) {
@@ -438,14 +440,14 @@ class GPanel extends JPanel implements MouseListener {
 					
 			    }
 			    else {
-				if(time1!=0) {
+				if(currentTimeout!=0) {
 					final Runnable stuffToDo = new Thread() {
 						@Override public void run() {computerMove();}
 					};
 					final ExecutorService executor = Executors.newSingleThreadExecutor();
 					final Future future = executor.submit(stuffToDo);
 					executor.shutdown();
-					try { future.get(time1, TimeUnit.MILLISECONDS); }
+					try { future.get(currentTimeout, TimeUnit.MILLISECONDS); }
 					catch (InterruptedException ie) {System.out.println(ie.getMessage());System.exit(0); }
 					catch (TimeoutException te) { timeup();}
 					catch (ExecutionException ee) { System.out.println(ee.getMessage());System.exit(0);}
@@ -463,14 +465,14 @@ class GPanel extends JPanel implements MouseListener {
 				inputEnabled = true;
 			      }
 			      else {
-				if(time1!=0) {
+				if(currentTimeout!=0) {
 					final Runnable stuffToDo = new Thread() {
 						@Override public void run(){ computerMove();}
 					};
 					final ExecutorService executor = Executors.newSingleThreadExecutor();
 					final Future future = executor.submit(stuffToDo);
 					executor.shutdown();
-					try { future.get(time1, TimeUnit.MILLISECONDS); }
+					try { future.get(currentTimeout, TimeUnit.MILLISECONDS); }
 					catch (InterruptedException ie) { System.out.println(ie.getMessage());System.exit(0);}
 					catch (TimeoutException te) { timeup();}
 					catch (ExecutionException ee) { System.out.println(ee.getMessage());System.exit(0);}
