@@ -11,17 +11,29 @@ manifest:
 Instructions for running:
 =========================
 	to start, type the folowing
-		$java -jar Reversi.jar timeout visual playerOne playerTwo
-		where:
-			-timeout is an integer that specifies how long each player has to make a move (in ms)
-			-visual is either the string "gui" or "text" depending on which you want to use. There's no api for human players to use the text-based version, so you'll have to use the gui.
-			-playerOne and playerTwo are strings that specify the players, if you want to use human players, just type in the -human flag. To use one of your programs, just pass the running instructions for your program as the variable (surround it with quotes).
+	tournament GUI BLACKPLAYER WHITEPLAYER DEPTHLIMIT TIMELIMIT TIMELIMIT2
 
-	for example, if I wanted to run the game with a 5 second timeout, a guid, player one as a human and player two as the SampleClient AI, I'd enter the following:
-		$java -jar Reversi.jar 5000 gui -human "SampleClient white"
-		but you can do whatever you want, no pressure
-		
-		the client file only takes on argument, a string, either "black" or "white" specifying which color the player is. Black is player 1, white is player 2
+	GUI is one of the following strings:
+	gui 	Display the game graphically (using X windows and the DISPLAY environmental variable).
+	text 	Print a record of the game to stdout
+	none 	Nothing is printed except the final winner of the game
+
+	Each of BLACKPLAYER and WHITEPLAYER is either the flag -human or the name of a player program directory (including the path if not in the working directory). If a player is human the player either uses the gui to enter her moves, or in the case of text display types her moves as pairs of integers to stdin after receiving a prompt. TIMELIMITs are not enforced for human players. For program players, the tournament program runs them and interacts with them via stdin and stdout as described above.
+
+	At the end of the game, the tournament program prints a single line to stdout of the form:
+
+	winner COLOR ADVANTAGE REASON
+
+	where COLOR is either the letter B or W, ADVANTAGE is an integer equal to (# winner squares - # loser squares), and REASON is one of the following strings:
+	legal 	The game was played properly by both players
+	timeout 	The losing program exceeded the time limit on a move
+	illegal 	The losing program made an illegal move
+
+Note that in the came of timeout or illegal, ADVANTAGE might be negative.	
+		where:
+
+		the sample client file only takes on argument, a string, either "black" or "white" specifying which color the player is. is very rudimentary, and as such has no support for depth limit, and you'll have to adjust the source code to modify how long it takes to make a move. Black is player 1, white is player 2
+	-you can use the run.sh script to quickly run the whole program, it takes the same arguments as the server file
 
 What can I do to make my own othello-player?
 ============================================
