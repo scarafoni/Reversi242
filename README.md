@@ -13,6 +13,9 @@ Instructions for running:
 	to start, type the folowing
 	tournament GUI BLACKPLAYER WHITEPLAYER DEPTHLIMIT TIMELIMIT TIMELIMIT2
 
+	examples: ./tournament gui "java SampleClient white" "java SampleClient black" 4 50000 0
+		  ./tournament text "./SampleCClient white" "java SampleJavaClient black" 10 50000 100000000
+	
 	GUI is one of the following strings:
 	gui 	Display the game graphically (using X windows and the DISPLAY environmental variable).
 	text 	Print a record of the game to stdout
