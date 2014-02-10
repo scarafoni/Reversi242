@@ -262,7 +262,7 @@ class GPanel extends JPanel implements MouseListener {
 				else writeout+= " B";
 				writeout+= " " + depth + " " + time1 + " " +time2;
 				currentIn.write(writeout+"\n");
-				System.out.println(writeout);
+				//System.out.println(writeout);
 				currentIn.flush();
 				try {
 						System.out.println("about to read input");
@@ -278,23 +278,26 @@ class GPanel extends JPanel implements MouseListener {
 				//System.out.println(board.textBoard());
 
 				//process numbers
+						//System.out.println("shouldn've passed");
+				if(!input.equals("pass")) {
 				String[] inputSplit = input.split(" ");
 				//System.out.println(inputSplit[0]+" "+inputSplit[1]);
-				try {
-					i = Integer.parseInt(inputSplit[0]);
-					j = Integer.parseInt(inputSplit[1]);
+					try {
+						i = Integer.parseInt(inputSplit[0]);
+						j = Integer.parseInt(inputSplit[1]);
 
-					if ((!iswhite && (i < 8) && (j < 8) && (board.get(i,j) == TKind.nil) && (board.move(new Move(i,j),TKind.black) != 0)) || 
-						(iswhite && (i < 8) && (j < 8) && (board.get(i,j) == TKind.nil) && (board.move(new Move(i,j),TKind.white) != 0))) 
-							validInput = true;
-					else 
+						if ((!iswhite && (i < 8) && (j < 8) && (board.get(i,j) == TKind.nil) && (board.move(new Move(i,j),TKind.black) != 0)) || 
+							(iswhite && (i < 8) && (j < 8) && (board.get(i,j) == TKind.nil) && (board.move(new Move(i,j),TKind.white) != 0))) 
+								validInput = true;
+						else 
+							illegalMove();
+					}catch(NumberFormatException e) {
+						if(!DISPLAY.equals("none"))
+							System.out.println("poorly formatted input");
 						illegalMove();
-				}catch(NumberFormatException e) {
-					if(!DISPLAY.equals("none"))
-						System.out.println("poorly formatted input");
-					illegalMove();
-					//validInput = false;
-				}
+						//validInput = false;
+					}
+			}
 		}catch(Exception e) {
 			e.printStackTrace();
 			System.exit(1); 
