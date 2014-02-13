@@ -257,13 +257,16 @@ class GPanel extends JPanel implements MouseListener {
 					otherIn = whiteIn;
 					otherOut = whiteOut;
 				}
-				String writeout = board.printBoard();
+				//write the request for the next move
+				String writeout = "game";//board.printBoard();
 				if(iswhite) writeout+= " W";
 				else writeout+= " B";
 				writeout+= " " + depth + " " + time1 + " " +time2;
 				currentIn.write(writeout+"\n");
-				//System.out.println(writeout);
 				currentIn.flush();
+				//write the map to the other player
+				//otherIn.write(board.printBoard()+"\n");
+				//otherIn.flush();
 				try {
 						System.out.println("about to read input");
 						input = currentOut.readLine();
@@ -278,7 +281,6 @@ class GPanel extends JPanel implements MouseListener {
 				//System.out.println(board.textBoard());
 
 				//process numbers
-						//System.out.println("shouldn've passed");
 				if(!input.equals("pass")) {
 				String[] inputSplit = input.split(" ");
 				//System.out.println(inputSplit[0]+" "+inputSplit[1]);
@@ -288,7 +290,11 @@ class GPanel extends JPanel implements MouseListener {
 
 						if ((!iswhite && (i < 8) && (j < 8) && (board.get(i,j) == TKind.nil) && (board.move(new Move(i,j),TKind.black) != 0)) || 
 							(iswhite && (i < 8) && (j < 8) && (board.get(i,j) == TKind.nil) && (board.move(new Move(i,j),TKind.white) != 0))) 
+							{
+								otherIn.write("\n"+board.printBoard()+"\n");
+								otherIn.flush();
 								validInput = true;
+							}
 						else 
 							illegalMove();
 					}catch(NumberFormatException e) {
@@ -298,11 +304,13 @@ class GPanel extends JPanel implements MouseListener {
 						//validInput = false;
 					}
 			}
+			//System.out.println(board.printBoard());
+			//otherIn.write(board.printBoard()+"\n");
+			//otherIn.flush();
 		}catch(Exception e) {
 			e.printStackTrace();
 			System.exit(1); 
 			}
-		
 		score_black.setText(Integer.toString(board.getCounter(TKind.black)));
 		score_white.setText(Integer.toString(board.getCounter(TKind.white)));
 		//repaint();

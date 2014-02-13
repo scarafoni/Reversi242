@@ -14,19 +14,24 @@ public class SampleClient {
             BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in));
             String fromServer= "";
             String fromUser= "";
+						PrintWriter files = new PrintWriter("test.txt","UTF-8");
 						//System.out.println("outside the loop");
             while ((fromServer = stdIn.readLine()) != "GAME_OVER") {
-							//System.out.println(fromServer);
+							String boardRead  = stdIn.readLine();
+							if(!boardRead.split(" ")[0].equals("game"))
+								files.append(boardRead);
+							files.close();
+							System.out.println("2 4");
 							String[] splitted = fromServer.split(" ");
 							if((splitted[1].equals("B") && myColor == color.black) ||
 								(splitted[1].equals("W") && myColor == color.white)) {
 								
-								board = new ReversiBoard(splitted[0]);
+								//board = new ReversiBoard(splitted[0]);
 								long time = System.currentTimeMillis();
 								while(System.currentTimeMillis() - time < 1000)
 									;
-								fromUser = makeMove(board);
-								System.out.println(fromUser);
+								//fromUser = makeMove(board);
+								//System.out.println("2 4");
 							}
 						}
         } catch (Exception e) {
