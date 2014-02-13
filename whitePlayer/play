@@ -3,4 +3,4 @@
 
 #keep this, this makes sure to run the files in this directory
 cd "$(dirname "$0")"
-java SampleClient white
+java -jar SampleClient.jar white
