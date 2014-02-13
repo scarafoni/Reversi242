@@ -264,6 +264,7 @@ class GPanel extends JPanel implements MouseListener {
 				writeout+= " " + depth + " " + time1 + " " +time2;
 				currentIn.write(writeout+"\n");
 				currentIn.flush();
+				//System.out.println("current "+writeout);
 				//write the map to the other player
 				//otherIn.write(board.printBoard()+"\n");
 				//otherIn.flush();
@@ -291,8 +292,9 @@ class GPanel extends JPanel implements MouseListener {
 						if ((!iswhite && (i < 8) && (j < 8) && (board.get(i,j) == TKind.nil) && (board.move(new Move(i,j),TKind.black) != 0)) || 
 							(iswhite && (i < 8) && (j < 8) && (board.get(i,j) == TKind.nil) && (board.move(new Move(i,j),TKind.white) != 0))) 
 							{
-								otherIn.write(board.printBoard()+"\n");
+								otherIn.write(input+"\n");
 								otherIn.flush();
+								//System.out.println("other "+input);
 								validInput = true;
 							}
 						else 
