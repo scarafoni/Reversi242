@@ -291,7 +291,7 @@ class GPanel extends JPanel implements MouseListener {
 						if ((!iswhite && (i < 8) && (j < 8) && (board.get(i,j) == TKind.nil) && (board.move(new Move(i,j),TKind.black) != 0)) || 
 							(iswhite && (i < 8) && (j < 8) && (board.get(i,j) == TKind.nil) && (board.move(new Move(i,j),TKind.white) != 0))) 
 							{
-								otherIn.write("\n"+board.printBoard()+"\n");
+								otherIn.write(board.printBoard()+"\n");
 								otherIn.flush();
 								validInput = true;
 							}
