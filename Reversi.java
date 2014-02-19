@@ -50,6 +50,8 @@ class GPanel extends JPanel implements MouseListener {
 	public String WHITE;
 	public boolean iswhite = true;
 	public String gameOverString = "GAME_OVER";
+	public String currentMove;
+	public boolean flag = false; //It will be set if both black and white could not make a legal move, even though the board is not full.
 
 	BufferedWriter blackIn;
 	BufferedReader blackOut;
@@ -101,6 +103,8 @@ class GPanel extends JPanel implements MouseListener {
 				blackPlayer = runtime.exec(blackProgram+"/play");
 				this.blackOut = new BufferedReader(new InputStreamReader(blackPlayer.getInputStream()));
 				this.blackIn = new BufferedWriter(new OutputStreamWriter(blackPlayer.getOutputStream()));
+				blackIn.write("game B "+depth+" "+time1+" "+time2 +"\n");
+				blackIn.flush();
 			}catch(Exception e){System.out.println("black's io isn't working");}
 		}
 		if (whiteProgram.equals("-human")) {
@@ -111,6 +115,8 @@ class GPanel extends JPanel implements MouseListener {
 				whitePlayer = runtime.exec(whiteProgram+"/play");
 				this.whiteOut = new BufferedReader(new InputStreamReader(whitePlayer.getInputStream()));
 				this.whiteIn = new BufferedWriter(new OutputStreamWriter(whitePlayer.getOutputStream()));
+				whiteIn.write("game W "+depth+" "+time1+" "+time2+"\n");
+				whiteIn.flush();
 			}catch(Exception e){System.out.println("white's io isn't working");}
 		}
 		
@@ -257,20 +263,14 @@ class GPanel extends JPanel implements MouseListener {
 					otherIn = whiteIn;
 					otherOut = whiteOut;
 				}
-				//write the request for the next move
-				String writeout = "game";//board.printBoard();
-				if(iswhite) writeout+= " W";
-				else writeout+= " B";
-				writeout+= " " + depth + " " + time1 + " " +time2;
-				currentIn.write(writeout+"\n");
-				currentIn.flush();
-				//System.out.println("current "+writeout);
-				//write the map to the other player
-				//otherIn.write(board.printBoard()+"\n");
-				//otherIn.flush();
 				try {
 						System.out.println("about to read input");
-						input = currentOut.readLine();
+			if ( (iswhite && !whH) || (!iswhite && !blH)) {
+                input = currentOut.readLine();
+			}
+			else {
+				input = this.currentMove;
+			}
 					
 				}catch(Exception io) {
 					System.out.println("couldn't read input");
@@ -292,10 +292,14 @@ class GPanel extends JPanel implements MouseListener {
 						if ((!iswhite && (i < 8) && (j < 8) && (board.get(i,j) == TKind.nil) && (board.move(new Move(i,j),TKind.black) != 0)) || 
 							(iswhite && (i < 8) && (j < 8) && (board.get(i,j) == TKind.nil) && (board.move(new Move(i,j),TKind.white) != 0))) 
 							{
-								otherIn.write(input+"\n");
+                                System.out.println(input);
+								if(otherIn != null) {
+								otherIn.write(input + "\n");
 								otherIn.flush();
-								//System.out.println("other "+input);
+								}
+									
 								validInput = true;
+								flag = false;
 							}
 						else 
 							illegalMove();
@@ -306,9 +310,16 @@ class GPanel extends JPanel implements MouseListener {
 						//validInput = false;
 					}
 			}
-			//System.out.println(board.printBoard());
-			//otherIn.write(board.printBoard()+"\n");
-			//otherIn.flush();
+			else
+			{
+				System.out.println(input);
+				otherIn.write(input + "\n");
+				otherIn.flush();
+				validInput = true;
+				if(flag)
+					showWinner();
+				flag = true;
+			}
 		}catch(Exception e) {
 			e.printStackTrace();
 			System.exit(1); 
@@ -323,12 +334,12 @@ class GPanel extends JPanel implements MouseListener {
 		if (iswhite && !board.userCanMove(TKind.black)) {
 			if(!DISPLAY.equals("none"))			
 				System.out.println("black cant move");
-			showWinner();
+			//showWinner();
 		}
 		if (!iswhite && !board.userCanMove(TKind.white)) {
 			if(!DISPLAY.equals("none"))
 				System.out.println("white cant move");
-			showWinner();
+			//showWinner();
 		}
 		run();
 
@@ -363,6 +374,20 @@ class GPanel extends JPanel implements MouseListener {
 						setCursor(savedCursor);			
 					}
 				});
+				this.currentMove = i + " " + j;
+				try {
+			    if (iswhite && !blH) {
+				  blackIn.write(this.currentMove + "\n");
+				  blackIn.flush();
+				}
+				if (!iswhite && !whH) {
+				  whiteIn.write(this.currentMove + "\n");
+				  whiteIn.flush();
+				}
+                }
+				catch (IOException ex) {
+				  System.out.println("human side output to pipe error\n");
+				}
 				inputEnabled = false;
 
 				if (board.gameEnd()) {
@@ -370,11 +395,11 @@ class GPanel extends JPanel implements MouseListener {
 				}
 				if (iswhite && !board.userCanMove(TKind.black)) {
 					System.out.println("black cant move");
-					showWinner();
+					//showWinner();
 				}
 				if (!iswhite && !board.userCanMove(TKind.white)) {
 					System.out.println("white cant move");
-					showWinner();
+					//showWinner();
 				}
 				run();
 			}

@@ -1,6 +1,6 @@
 othello: othello.c
-	gcc othello.c -o player
+	gcc -Wall othello.c -o play
 clean:
-	rm -f player
+	rm -f play
 zip:
 	cd ..; rm -f KautzPlayer.zip; zip -r KautzPlayer.zip KautzPlayer
