@@ -263,6 +263,8 @@ class GPanel extends JPanel implements MouseListener {
 					otherIn = whiteIn;
 					otherOut = whiteOut;
 				}
+				if(!board.userCanMove(TKind.black)&& !board.userCanMove(TKind.white))
+					showWinner();	
 				try {
 						System.out.println("about to read input");
 			if ( (iswhite && !whH) || (!iswhite && !blH)) {
@@ -305,11 +307,9 @@ class GPanel extends JPanel implements MouseListener {
 							illegalMove();
 					}catch(NumberFormatException e) {
 						if(!DISPLAY.equals("none"))
-						{
-							System.out.println(input);
 							System.out.println("poorly formatted input");
-						}
 						illegalMove();
+						//validInput = false;
 					}
 			}
 			else
@@ -336,14 +336,12 @@ class GPanel extends JPanel implements MouseListener {
 		if (iswhite && !board.userCanMove(TKind.black)) {
 			if(!DISPLAY.equals("none"))			
 				System.out.println("black cant move");
-			if(flag)
-				showWinner();
+			//showWinner();
 		}
 		if (!iswhite && !board.userCanMove(TKind.white)) {
 			if(!DISPLAY.equals("none"))
 				System.out.println("white cant move");
-			if(flag)
-				showWinner();
+			//showWinner();
 		}
 		run();
 
