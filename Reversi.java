@@ -310,7 +310,6 @@ class GPanel extends JPanel implements MouseListener {
 							System.out.println("poorly formatted input");
 						}
 						illegalMove();
-						//validInput = false;
 					}
 			}
 			else
