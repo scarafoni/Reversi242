@@ -213,7 +213,7 @@ class GPanel extends JPanel implements MouseListener {
 			System.out.println("winner W " +  (board.counter[1] - board.counter[0]) + " legal");
 		}
 		else {
-			System.out.println("Draw");
+			System.out.println("winner T 0 legal");
 			//JOptionPane.showMessageDialog(this, "Drawn!","Reversi",JOptionPane.INFORMATION_MESSAGE);
 		}
 		System.exit(0);	
