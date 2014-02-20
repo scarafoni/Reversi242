@@ -220,7 +220,6 @@ class GPanel extends JPanel implements MouseListener {
 	}
 
 	public void setHint(Move hint) {
-		//System.out.println("Reversi: setHint");
 		this.hint = hint;
 	}
 
