@@ -1,5 +1,5 @@
 #!/bin/bash 
 # Use: tournament interface player1Folder player2Folder maxDepth timeout1 timeout2
 
-java -jar Reversi.jar "$1" "$2" "$3" "$4" "$5" "$6"
+java -jar "$(dirname "$0")"/Reversi.jar "$1" "$2" "$3" "$4" "$5" "$6"
 #java Reversi "$1" "$2" "$3" "$4" "$5" "$6"
