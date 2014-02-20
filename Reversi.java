@@ -266,6 +266,7 @@ class GPanel extends JPanel implements MouseListener {
 				//if(!board.userCanMove(TKind.black)&& !board.userCanMove(TKind.white))
 					//showWinner();	
 				try {
+					if(!DISPLAY.equals("none"))
 						System.out.println("about to read input");
 			if ( (iswhite && !whH) || (!iswhite && !blH)) {
                 input = currentOut.readLine();
@@ -275,8 +276,10 @@ class GPanel extends JPanel implements MouseListener {
 			}
 					
 				}catch(Exception io) {
-					System.out.println("couldn't read input");
-					System.exit(1);
+					if(!DISPLAY.equals("none"))
+						System.out.println("couldn't read input");
+					//System.exit(1);
+					illegalMove();
 				}
 					if(!DISPLAY.equals("none"))
 						System.out.println("read input: "+input);
@@ -294,7 +297,8 @@ class GPanel extends JPanel implements MouseListener {
 						if ((!iswhite && (i < 8) && (j < 8) && (board.get(i,j) == TKind.nil) && (board.move(new Move(i,j),TKind.black) != 0)) || 
 							(iswhite && (i < 8) && (j < 8) && (board.get(i,j) == TKind.nil) && (board.move(new Move(i,j),TKind.white) != 0))) 
 							{
-                                System.out.println(input);
+				if(!DISPLAY.equals("none"))
+                        	  System.out.println(input);
 								if(otherIn != null) {
 								otherIn.write(input + "\n");
 								otherIn.flush();
@@ -314,11 +318,13 @@ class GPanel extends JPanel implements MouseListener {
 			}
 			else
 			{
-				if((iswhite && !blH) || (!iswhite && !whH)){
-				System.out.println(input);
-				otherIn.write(input + "\n");
-				otherIn.flush();
-				validInput = true;
+				//if((iswhite && !blH) || (!iswhite && !whH)){
+				if(otherIn != null) {
+					if(!DISPLAY.equals("none"))
+						System.out.println(input);
+					otherIn.write(input + "\n");
+					otherIn.flush();
+					validInput = true;
 				}
 				//if(flag)
 					//showWinner();
