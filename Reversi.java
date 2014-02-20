@@ -263,8 +263,8 @@ class GPanel extends JPanel implements MouseListener {
 					otherIn = whiteIn;
 					otherOut = whiteOut;
 				}
-				if(!board.userCanMove(TKind.black)&& !board.userCanMove(TKind.white))
-					showWinner();	
+				//if(!board.userCanMove(TKind.black)&& !board.userCanMove(TKind.white))
+					//showWinner();	
 				try {
 						System.out.println("about to read input");
 			if ( (iswhite && !whH) || (!iswhite && !blH)) {
@@ -301,7 +301,7 @@ class GPanel extends JPanel implements MouseListener {
 								}
 									
 								validInput = true;
-								flag = false;
+								//flag = false;
 							}
 						else 
 							illegalMove();
@@ -318,9 +318,9 @@ class GPanel extends JPanel implements MouseListener {
 				otherIn.write(input + "\n");
 				otherIn.flush();
 				validInput = true;
-				if(flag)
-					showWinner();
-				flag = true;
+				//if(flag)
+					//showWinner();
+				//flag = true;
 			}
 		}catch(Exception e) {
 			e.printStackTrace();
@@ -333,14 +333,19 @@ class GPanel extends JPanel implements MouseListener {
 		if (board.gameEnd()) 
 			showWinner();
 
+		flag = false;
 		if (iswhite && !board.userCanMove(TKind.black)) {
 			if(!DISPLAY.equals("none"))			
 				System.out.println("black cant move");
 			//showWinner();
+			if(blH)
+				flag = true;
 		}
 		if (!iswhite && !board.userCanMove(TKind.white)) {
 			if(!DISPLAY.equals("none"))
 				System.out.println("white cant move");
+			if(whH)
+				flag = true;
 			//showWinner();
 		}
 		run();
@@ -395,12 +400,18 @@ class GPanel extends JPanel implements MouseListener {
 				if (board.gameEnd()) {
 					showWinner();			
 				}
+				if(blH && whH)
+					flag = false;
 				if (iswhite && !board.userCanMove(TKind.black)) {
 					System.out.println("black cant move");
+					if(blH)
+						flag = true;
 					//showWinner();
 				}
 				if (!iswhite && !board.userCanMove(TKind.white)) {
 					System.out.println("white cant move");
+					if(whH)
+						flag = true;
 					//showWinner();
 				}
 				run();
@@ -467,7 +478,26 @@ class GPanel extends JPanel implements MouseListener {
 		//System.out.println("GPanel: run");
 
 		//while(!board.gameEnd()) {
-			iswhite = !iswhite;
+			if(!board.userCanMove(TKind.black)&& !board.userCanMove(TKind.white))
+                    showWinner();
+			if((whH || blH) && flag)
+			{
+				try {
+                if (whH && !blH) {
+                  blackIn.write("pass\n");
+                  blackIn.flush();
+                }
+                if (blH && !whH) {
+                  whiteIn.write("pass\n");
+                  whiteIn.flush();
+                }
+                }
+                catch (IOException ex) {
+                  System.out.println("human side output to pipe error\n");
+                }
+			}
+			else
+				iswhite = !iswhite;
 			int currentTimeout = time1;
 
 			if(DISPLAY.equals("text")) {
