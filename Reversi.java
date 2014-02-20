@@ -314,10 +314,12 @@ class GPanel extends JPanel implements MouseListener {
 			}
 			else
 			{
+				if((iswhite && !blH) || (!iswhite && !whH)){
 				System.out.println(input);
 				otherIn.write(input + "\n");
 				otherIn.flush();
 				validInput = true;
+				}
 				//if(flag)
 					//showWinner();
 				//flag = true;
