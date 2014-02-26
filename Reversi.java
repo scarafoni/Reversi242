@@ -52,6 +52,7 @@ class GPanel extends JPanel implements MouseListener {
 	public String gameOverString = "GAME_OVER";
 	public String currentMove;
 	public boolean flag = false; //It will be set if both black and white could not make a legal move, even though the board is not full.
+	public Process blackPlayer, whitePlayer;
 
 	BufferedWriter blackIn;
 	BufferedReader blackOut;
@@ -72,7 +73,6 @@ class GPanel extends JPanel implements MouseListener {
 		this.score_white = score_white;
 
 		Runtime runtime = Runtime.getRuntime();
-		Process blackPlayer, whitePlayer;
 		/*
 		try{
 			blackPlayer = runtime.exec(blackProgram);
@@ -216,6 +216,10 @@ class GPanel extends JPanel implements MouseListener {
 			System.out.println("winner T 0 legal");
 			//JOptionPane.showMessageDialog(this, "Drawn!","Reversi",JOptionPane.INFORMATION_MESSAGE);
 		}
+		if(blackPlayer != null)
+			blackPlayer.destroy();
+		if(whitePlayer != null)
+		whitePlayer.destroy();
 		System.exit(0);	
 	}
 
@@ -331,6 +335,10 @@ class GPanel extends JPanel implements MouseListener {
 			}
 		}catch(Exception e) {
 			e.printStackTrace();
+			if(blackPlayer != null)
+				blackPlayer.destroy();
+			if(whitePlayer != null)
+			whitePlayer.destroy();
 			System.exit(1); 
 			}
 		score_black.setText(Integer.toString(board.getCounter(TKind.black)));
@@ -462,6 +470,10 @@ class GPanel extends JPanel implements MouseListener {
 		System.out.println(gameOverString);
 		//whiteSocket.sendBoard(gameOverString);
 		//blackSocket.sendBoard(gameOverString);
+		if(blackPlayer != null)
+			blackPlayer.destroy();
+		if(whitePlayer != null)
+			whitePlayer.destroy();
 		System.exit(0);
 	}
 	public void illegalMove() {
@@ -474,6 +486,10 @@ class GPanel extends JPanel implements MouseListener {
 		System.out.println(gameOverString);
 		//whiteSocket.sendBoard(gameOverString);
 		//blackSocket.sendBoard(gameOverString);
+		if(blackPlayer != null)
+			blackPlayer.destroy();
+		if(whitePlayer != null)
+		whitePlayer.destroy();
 		System.exit(0);
 	}
 
@@ -528,9 +544,21 @@ class GPanel extends JPanel implements MouseListener {
 					final Future future = executor.submit(stuffToDo);
 					executor.shutdown();
 					try { future.get(currentTimeout, TimeUnit.MILLISECONDS); }
-					catch (InterruptedException ie) {System.out.println(ie.getMessage());System.exit(0); }
+					catch (InterruptedException ie) {
+							System.out.println(ie.getMessage()); 
+							if(blackPlayer != null) 
+								blackPlayer.destroy();
+							if(whitePlayer != null) 
+								whitePlayer.destroy(); 
+							System.exit(0); }
 					catch (TimeoutException te) { timeup();}
-					catch (ExecutionException ee) { System.out.println(ee.getMessage());System.exit(0);}
+					catch (ExecutionException ee) { 
+							System.out.println(ee.getMessage()); 
+							if(blackPlayer != null)
+								blackPlayer.destroy();
+							if(whitePlayer != null)
+							whitePlayer.destroy(); 
+							System.exit(0);}
 					if (!executor.isTerminated())
 					executor.shutdownNow();
 				}
@@ -553,9 +581,24 @@ class GPanel extends JPanel implements MouseListener {
 					final Future future = executor.submit(stuffToDo);
 					executor.shutdown();
 					try { future.get(currentTimeout, TimeUnit.MILLISECONDS); }
-					catch (InterruptedException ie) { System.out.println(ie.getMessage());System.exit(0);}
+					catch (InterruptedException ie) {
+							System.out.println(ie.getMessage()); 
+							if(blackPlayer != null) 
+								blackPlayer.destroy();
+							if(whitePlayer != null) 
+								whitePlayer.destroy(); 
+							System.exit(0); }
+					//catch (InterruptedException ie) { System.out.println(ie.getMessage());  blackPlayer.destroy();whitePlayer.destroy();  System.exit(0);}
 					catch (TimeoutException te) { timeup();}
-					catch (ExecutionException ee) { System.out.println(ee.getMessage());System.exit(0);}
+					catch (ExecutionException ee) {
+							System.out.println(ee.getMessage()); 
+							if(blackPlayer != null) 
+								blackPlayer.destroy();
+							if(whitePlayer != null) 
+								whitePlayer.destroy(); 
+							System.exit(0); }
+
+					//catch (ExecutionException ee) { System.out.println(ee.getMessage());  blackPlayer.destroy();whitePlayer.destroy();   System.exit(0);}
 					if (!executor.isTerminated())
 					executor.shutdownNow();
 				}
