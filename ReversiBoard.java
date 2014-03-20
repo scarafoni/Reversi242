@@ -108,9 +108,9 @@ public class ReversiBoard {
 			toReturn+="\n";
 			for(int y = 0; y<8; y++) {
 				toReturn+= "|";
-				if(board[x][y] == TKind.black)
+				if(board[y][x] == TKind.black)
 					toReturn+= "B";
-				else if(board[x][y] == TKind.white)
+				else if(board[y][x] == TKind.white)
 					toReturn+= "W";
 				else
 					toReturn+= " ";

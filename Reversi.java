@@ -32,6 +32,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.ExecutionException;
@@ -39,10 +40,12 @@ import java.util.concurrent.ExecutionException;
 class GPanel extends JPanel implements MouseListener {
 
 
-	
+	public boolean FLAG = false;
 	public int time1;
 	public int time2;
 	public int depth;
+	public int blackTimeLeft;
+	public int whiteTimeLeft;
 	public String DISPLAY;
 	public boolean whH = false;
 	public boolean blH = false;
@@ -86,10 +89,11 @@ class GPanel extends JPanel implements MouseListener {
 		//System.out.println("done initing readers");
 		*/
 		time1 = t1;
-		time2 = t2;
 		depth = de;
 		DISPLAY = disp;
-		
+		blackTimeLeft =t2*1000;
+		whiteTimeLeft =t2*1000;
+		time2 = t2;
 		if((blackProgram.equals("-human") || whiteProgram.equals("-human")) && !disp.equals("gui")) {
 			System.out.println("Need gui for human players");
 			System.exit(0);
@@ -103,9 +107,12 @@ class GPanel extends JPanel implements MouseListener {
 				blackPlayer = runtime.exec(blackProgram+"/play");
 				this.blackOut = new BufferedReader(new InputStreamReader(blackPlayer.getInputStream()));
 				this.blackIn = new BufferedWriter(new OutputStreamWriter(blackPlayer.getOutputStream()));
+				//blackIn.write("game B "+depth+" "+time1+" "+time2 +"\n");
 				blackIn.write("game B "+depth+" "+time1+" "+time2 +"\n");
 				blackIn.flush();
-			}catch(Exception e){System.out.println("black's io isn't working");}
+			}catch(Exception e){
+					if(!DISPLAY.equals("none"))
+						System.out.println("black's io isn't working");}
 		}
 		if (whiteProgram.equals("-human")) {
 			whH = true;
@@ -115,9 +122,12 @@ class GPanel extends JPanel implements MouseListener {
 				whitePlayer = runtime.exec(whiteProgram+"/play");
 				this.whiteOut = new BufferedReader(new InputStreamReader(whitePlayer.getInputStream()));
 				this.whiteIn = new BufferedWriter(new OutputStreamWriter(whitePlayer.getOutputStream()));
+				//whiteIn.write("game W "+depth+" "+time1+" "+time2+"\n");
 				whiteIn.write("game W "+depth+" "+time1+" "+time2+"\n");
 				whiteIn.flush();
-			}catch(Exception e){System.out.println("white's io isn't working");}
+			}catch(Exception e){
+				if(!DISPLAY.equals("none"))
+					System.out.println("white's io isn't working");}
 		}
 		
 		gameLevel = level;
@@ -237,7 +247,6 @@ class GPanel extends JPanel implements MouseListener {
 	}
 
 
-
 	public void computerMove() {
 		paintImmediately(0, 0, Reversi.Width, Reversi.Height);
 		repaint();
@@ -266,13 +275,15 @@ class GPanel extends JPanel implements MouseListener {
 					otherIn = whiteIn;
 					otherOut = whiteOut;
 				}
+
+
 				//if(!board.userCanMove(TKind.black)&& !board.userCanMove(TKind.white))
 					//showWinner();	
 				try {
 					if(!DISPLAY.equals("none"))
 						System.out.println("about to read input");
 			if ( (iswhite && !whH) || (!iswhite && !blH)) {
-                input = currentOut.readLine();
+                		input = currentOut.readLine();
 			}
 			else {
 				input = this.currentMove;
@@ -286,6 +297,7 @@ class GPanel extends JPanel implements MouseListener {
 				}
 					if(!DISPLAY.equals("none"))
 						System.out.println("read input: "+input);
+				if(input == null) {illegalMove();}
 					
 				//System.out.println(board.textBoard());
 
@@ -300,11 +312,20 @@ class GPanel extends JPanel implements MouseListener {
 						if ((!iswhite && (i < 8) && (j < 8) && (board.get(i,j) == TKind.nil) && (board.move(new Move(i,j),TKind.black) != 0)) || 
 							(iswhite && (i < 8) && (j < 8) && (board.get(i,j) == TKind.nil) && (board.move(new Move(i,j),TKind.white) != 0))) 
 							{
-				if(!DISPLAY.equals("none"))
-                        	  System.out.println(input);
-								if(otherIn != null) {
+					if(!DISPLAY.equals("none"))
+                        		  System.out.println(input);
+							if(otherIn != null) {
+								try {
 								otherIn.write(input + "\n");
 								otherIn.flush();
+								}
+								catch(IOException ioe) {
+									if(!DISPLAY.equals("none"))
+										ioe.printStackTrace();
+									iswhite = !iswhite;
+									illegalMove();
+
+								}
 								}
 									
 								validInput = true;
@@ -321,12 +342,32 @@ class GPanel extends JPanel implements MouseListener {
 			}
 			else
 			{
+				//if(!board.userCanMove(TKind.black)&& !board.userCanMove(TKind.white))
+				if(iswhite && board.userCanMove(TKind.white)) {
+					if(!DISPLAY.equals("none"))
+							System.out.println("White has moves!");
+					illegalMove();
+				}
+				if(!iswhite && board.userCanMove(TKind.black)) {
+					if(!DISPLAY.equals("none"))
+							System.out.println("Black has moves!");
+					illegalMove();
+				}
 				//if((iswhite && !blH) || (!iswhite && !whH)){
 				if(otherIn != null) {
 					if(!DISPLAY.equals("none"))
 						System.out.println(input);
-					otherIn.write(input + "\n");
-					otherIn.flush();
+					try {
+						otherIn.write(input + "\n");
+						otherIn.flush();
+						}
+						catch(IOException ioe) {
+							if(!DISPLAY.equals("none"))
+								ioe.printStackTrace();
+							iswhite = !iswhite;
+							illegalMove();
+
+						}
 					validInput = true;
 				}
 				//if(flag)
@@ -334,13 +375,17 @@ class GPanel extends JPanel implements MouseListener {
 				//flag = true;
 			}
 		}catch(Exception e) {
-			e.printStackTrace();
-			if(blackPlayer != null)
+			if(!DISPLAY.equals("none"))
+				e.printStackTrace();
+			if(blackPlayer != null) {
 				blackPlayer.destroy();
-			if(whitePlayer != null)
-			whitePlayer.destroy();
-			System.exit(1); 
 			}
+			if(whitePlayer != null) {
+				whitePlayer.destroy();
+			}
+			illegalMove();
+			System.exit(1); 
+		}
 		score_black.setText(Integer.toString(board.getCounter(TKind.black)));
 		score_white.setText(Integer.toString(board.getCounter(TKind.white)));
 		//repaint();
@@ -363,7 +408,7 @@ class GPanel extends JPanel implements MouseListener {
 				flag = true;
 			//showWinner();
 		}
-		run();
+		//run();
 
 		/*if (board.gameEnd()) 
 			showWinner();
@@ -467,29 +512,36 @@ class GPanel extends JPanel implements MouseListener {
 		else {
 			System.out.println("winner W " +  (board.counter[1] - board.counter[0]) + " timeout");	
 		}
-		System.out.println(gameOverString);
+		if(!DISPLAY.equals("none"))
+			System.out.println(gameOverString);
 		//whiteSocket.sendBoard(gameOverString);
 		//blackSocket.sendBoard(gameOverString);
 		if(blackPlayer != null)
 			blackPlayer.destroy();
 		if(whitePlayer != null)
 			whitePlayer.destroy();
+		DISPLAY = "none";
 		System.exit(0);
+		
 	}
 	public void illegalMove() {
-		if(iswhite) {
-			System.out.println("winner B " +  (board.counter[0] - board.counter[1]) + " Illegal");
+		if(!FLAG) {
+			if(iswhite) {
+				System.out.println("winner B " +  (board.counter[0] - board.counter[1]) + " Illegal");
+			}
+			else {
+				System.out.println("winner W " + (board.counter[1] - board.counter[0]) + " Illegal");
+			}
+			if(!DISPLAY.equals("none"))
+				System.out.println(gameOverString);
+			//whiteSocket.sendBoard(gameOverString);
+			//blackSocket.sendBoard(gameOverString);
+			if(blackPlayer != null)
+				blackPlayer.destroy();
+			if(whitePlayer != null)
+			whitePlayer.destroy();
+			
 		}
-		else {
-			System.out.println("winner W " + (board.counter[1] - board.counter[0]) + " Illegal");
-		}
-		System.out.println(gameOverString);
-		//whiteSocket.sendBoard(gameOverString);
-		//blackSocket.sendBoard(gameOverString);
-		if(blackPlayer != null)
-			blackPlayer.destroy();
-		if(whitePlayer != null)
-		whitePlayer.destroy();
 		System.exit(0);
 	}
 
@@ -497,122 +549,197 @@ class GPanel extends JPanel implements MouseListener {
 	public void run() {
 		inputEnabled = false;
 		repaint();
-		
+
 		//System.out.println("GPanel: run");
 
 		//while(!board.gameEnd()) {
-			if(!board.userCanMove(TKind.black)&& !board.userCanMove(TKind.white))
-                    showWinner();
-			if((whH || blH) && flag)
-			{
-				try {
-                if (whH && !blH) {
-                  blackIn.write("pass\n");
-                  blackIn.flush();
-                }
-                if (blH && !whH) {
-                  whiteIn.write("pass\n");
-                  whiteIn.flush();
-                }
-                }
-                catch (IOException ex) {
-                  System.out.println("human side output to pipe error\n");
-                }
+		if(!board.userCanMove(TKind.black)&& !board.userCanMove(TKind.white))
+			showWinner();
+		if((whH || blH) && flag)
+		{
+			try {
+				if (whH && !blH) {
+					blackIn.write("pass\n");
+					blackIn.flush();
+				}
+				if (blH && !whH) {
+					whiteIn.write("pass\n");
+					whiteIn.flush();
+				}
 			}
-			else
-				iswhite = !iswhite;
-			int currentTimeout = time1;
-
-			if(DISPLAY.equals("text")) {
-				System.out.println(board.textBoard());
+			catch (IOException ex) {
+				System.out.println("human side output to pipe error\n");
 			}
+		}
+		else
+			iswhite = !iswhite;
+		int currentTimeout = time1;
+		
+		if(DISPLAY.equals("text")) {
+			System.out.println(board.textBoard());
+		}
 
-			if(iswhite) {
-				currentTimeout = time2;
-				if(!DISPLAY.equals("none"))
-			   		 System.out.println("IT IS WHITE'S TURN");
-			    if(whH) {
-					inputEnabled = true;
-					
-			    }
-			    else {
-				if(currentTimeout!=0) {
-					final Runnable stuffToDo = new Thread() {
-						@Override public void run() {computerMove();}
+		if(iswhite) {
+			if(!DISPLAY.equals("none"))
+			System.out.println("IT IS WHITE'S TURN");
+			if(whH) {
+				inputEnabled = true;
+
+			}
+			else {
+				if(time2!=0) {
+					final Runnable mstuffToDo = new Thread() {
+						@Override public void run() {
+							computerMove();
+						}
 					};
-					final ExecutorService executor = Executors.newSingleThreadExecutor();
-					final Future future = executor.submit(stuffToDo);
-					executor.shutdown();
-					try { future.get(currentTimeout, TimeUnit.MILLISECONDS); }
+					long start_w_time = System.currentTimeMillis();
+					final ExecutorService mexecutor = Executors.newSingleThreadExecutor();
+					final Future mfuture = mexecutor.submit(mstuffToDo);
+					mexecutor.shutdown();
+					try { mfuture.get(whiteTimeLeft, TimeUnit.MILLISECONDS); }
 					catch (InterruptedException ie) {
+						System.out.println(ie.getMessage()); 
+						if(blackPlayer != null) 
+							blackPlayer.destroy();
+						if(whitePlayer != null) 
+							whitePlayer.destroy(); 
+						System.exit(0);
+					}
+					catch (TimeoutException te) {mfuture.cancel(true); FLAG = true; timeup();}
+					catch (ExecutionException ee) { 
+						System.out.println(ee.getMessage()); 
+						if(blackPlayer != null)
+							blackPlayer.destroy();
+						if(whitePlayer != null)
+							whitePlayer.destroy(); 
+						System.exit(0);
+					}
+					if (!mexecutor.isTerminated())
+						mexecutor.shutdownNow();
+					mfuture.cancel(true);
+
+					whiteTimeLeft = whiteTimeLeft - (int)(System.currentTimeMillis() - start_w_time);
+				}
+				else {
+					if(time1!=0) {
+						final Runnable stuffToDo = new Thread() {
+							@Override public void run() {computerMove();}
+						};
+						final ExecutorService executor = Executors.newSingleThreadExecutor();
+						final Future future = executor.submit(stuffToDo);
+						executor.shutdown();
+						try { future.get(time1, TimeUnit.SECONDS); }
+						catch (InterruptedException ie) {
 							System.out.println(ie.getMessage()); 
 							if(blackPlayer != null) 
 								blackPlayer.destroy();
 							if(whitePlayer != null) 
 								whitePlayer.destroy(); 
-							System.exit(0); }
-					catch (TimeoutException te) { timeup();}
-					catch (ExecutionException ee) { 
+							System.exit(0);
+						}
+						catch (TimeoutException te) {future.cancel(true); FLAG = true; timeup();}
+						catch (ExecutionException ee) { 
 							System.out.println(ee.getMessage()); 
 							if(blackPlayer != null)
 								blackPlayer.destroy();
 							if(whitePlayer != null)
-							whitePlayer.destroy(); 
-							System.exit(0);}
-					if (!executor.isTerminated())
-					executor.shutdownNow();
+								whitePlayer.destroy(); 
+							System.exit(0);
+						}
+						if (!executor.isTerminated())
+							executor.shutdownNow();
+						future.cancel(true);
+					}
+					else {computerMove();}
 				}
-				else {computerMove();}
-
-			    }
+				run();
+			}
+		}
+		else {
+			if(!DISPLAY.equals("none"))
+				System.out.println("IT IS BLACK'S TURN");
+			if(blH) {
+				inputEnabled = true;
 			}
 			else {
-			if(!DISPLAY.equals("none"))
-				  System.out.println("IT IS BLACK'S TURN");
-			      if(blH) {
-				inputEnabled = true;
-			      }
-			      else {
-				if(currentTimeout!=0) {
-					final Runnable stuffToDo = new Thread() {
-						@Override public void run(){ computerMove();}
+				if(time2!=0) {
+					final Runnable mstuffToDo = new Thread() {
+						@Override public void run() {
+							computerMove();
+						};
 					};
-					final ExecutorService executor = Executors.newSingleThreadExecutor();
-					final Future future = executor.submit(stuffToDo);
-					executor.shutdown();
-					try { future.get(currentTimeout, TimeUnit.MILLISECONDS); }
+					long start_b_time = System.currentTimeMillis();
+
+					final ExecutorService mexecutor = Executors.newSingleThreadExecutor();
+					final Future mfuture = mexecutor.submit(mstuffToDo);
+					mexecutor.shutdown();
+					try { mfuture.get(whiteTimeLeft, TimeUnit.MILLISECONDS); }
 					catch (InterruptedException ie) {
+						System.out.println(ie.getMessage()); 
+						if(blackPlayer != null) 
+							blackPlayer.destroy();
+						if(whitePlayer != null) 
+							whitePlayer.destroy(); 
+						System.exit(0);
+					}
+					catch (TimeoutException te) {mfuture.cancel(true); FLAG = true; timeup();}
+					catch (ExecutionException ee) { 
+						System.out.println(ee.getMessage()); 
+						if(blackPlayer != null)
+							blackPlayer.destroy();
+						if(whitePlayer != null)
+							whitePlayer.destroy(); 
+						System.exit(0);
+					}
+					if (!mexecutor.isTerminated())
+						mexecutor.shutdownNow();
+					mfuture.cancel(true);
+
+					blackTimeLeft = blackTimeLeft - (int)(System.currentTimeMillis() - start_b_time);
+				}
+				else {
+					if(time1!=0) {
+						final Runnable stuffToDo = new Thread() {
+							@Override public void run(){ computerMove();}
+						};
+						final ExecutorService executor = Executors.newSingleThreadExecutor();
+						final Future future = executor.submit(stuffToDo);
+						executor.shutdown();
+						try { future.get(time1, TimeUnit.SECONDS); }
+						catch (InterruptedException ie) {
 							System.out.println(ie.getMessage()); 
 							if(blackPlayer != null) 
 								blackPlayer.destroy();
 							if(whitePlayer != null) 
 								whitePlayer.destroy(); 
-							System.exit(0); }
-					//catch (InterruptedException ie) { System.out.println(ie.getMessage());  blackPlayer.destroy();whitePlayer.destroy();  System.exit(0);}
-					catch (TimeoutException te) { timeup();}
-					catch (ExecutionException ee) {
+							System.exit(0); 
+						}
+						catch (TimeoutException te) {future.cancel(true); FLAG = true;  timeup();}
+						catch (ExecutionException ee) {
 							System.out.println(ee.getMessage()); 
 							if(blackPlayer != null) 
 								blackPlayer.destroy();
 							if(whitePlayer != null) 
 								whitePlayer.destroy(); 
-							System.exit(0); }
-
-					//catch (ExecutionException ee) { System.out.println(ee.getMessage());  blackPlayer.destroy();whitePlayer.destroy();   System.exit(0);}
-					if (!executor.isTerminated())
-					executor.shutdownNow();
+							System.exit(0); 
+						}
+						if (!executor.isTerminated())
+							executor.shutdownNow();
+						future.cancel(true);
+					}
+					else {computerMove();}
 				}
-				else {computerMove();}
-			      }
+				run();
 			}
+		}
+
+
+
 		//}
 		//showWinner();
 
 	}
-
-
-
-
 
 };
 
